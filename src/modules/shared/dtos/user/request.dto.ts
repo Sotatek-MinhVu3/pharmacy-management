@@ -18,6 +18,27 @@ export class CreateUserDto {
   phone: string;
 }
 
+export class CreateBranchAdminDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
+
+  @IsNotEmpty()
+  branchId: number;
+
+  @IsNotEmpty()
+  firstName: string;
+
+  @IsNotEmpty()
+  lastName: string;
+
+  @IsNotEmpty()
+  phone: string;
+}
+
 export class UpdateUserDto {
   firstName: string;
   lastName: string;

@@ -5,9 +5,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../database/entities/user.entity';
 import { Repository } from 'typeorm';
 import {
+  CreateBranchAdminDto,
   CreateUserDto,
   LoginUserDto,
   UpdateUserDto,
@@ -15,6 +15,7 @@ import {
 import { ERole } from '../shared/constants';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { User } from 'src/database/entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -35,7 +36,14 @@ export class UserService {
     };
   }
 
-  async createBranchAdmin(reqBody: CreateUserDto) {
+  async createBranchAdmin(reqBody: CreateBranchAdminDto) {
+    const branchAdmins = await this.getAll(ERole.BRANCH_ADMIN);
+    const existedBranchAdmins = branchAdmins.filter(
+      (bra) => bra.branchId === reqBody.branchId,
+    );
+    if (existedBranchAdmins.length) {
+      throw new BadRequestException('This branch already has a manager!');
+    }
     const newBranchAdmin = await this.create(reqBody, ERole.BRANCH_ADMIN);
     await this.userRepo.save(newBranchAdmin);
 
