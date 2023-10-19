@@ -12,7 +12,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto, UpdateUserDto } from '../shared/dtos/user/request.dto';
+import {
+  CreateBranchAdminDto,
+  CreateUserDto,
+  UpdateUserDto,
+} from '../shared/dtos/user/request.dto';
 import { CustomAuthGuard } from 'src/guards/custom-auth.guard';
 import { Request } from 'express';
 import { plainToClass } from 'class-transformer';
@@ -29,7 +33,7 @@ export class UserController {
 
   @Post('/branch-admin')
   @UseGuards(new RoleGuard([ERole.ADMIN]))
-  async createBranchAdmin(@Body() reqBody: CreateUserDto) {
+  async createBranchAdmin(@Body() reqBody: CreateBranchAdminDto) {
     return await this.userService.createBranchAdmin(reqBody);
   }
 
