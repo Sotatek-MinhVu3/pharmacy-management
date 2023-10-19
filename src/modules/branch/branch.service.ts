@@ -42,7 +42,7 @@ export class BranchService {
   }
 
   async updateBranch(branchId: number, reqBody: UpdateBranchDto) {
-    let branch = await this.branchRepo.findOneBy({ id: branchId });
+    let branch = await this.getBranchById(branchId);
     branch = { ...branch, ...reqBody };
     await this.branchRepo.save(branch);
     return {
