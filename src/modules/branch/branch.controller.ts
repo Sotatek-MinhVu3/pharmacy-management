@@ -45,7 +45,7 @@ export class BranchController {
 
   @Delete('/:id')
   @UseGuards(new RoleGuard([ERole.ADMIN]))
-  async deleteBranch(@Param() id: number) {
+  async deleteBranch(@Param('id') id: number) {
     return await this.branchService.deleteBranch(id);
   }
 }

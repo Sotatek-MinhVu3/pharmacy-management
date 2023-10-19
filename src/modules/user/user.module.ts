@@ -4,7 +4,7 @@ import { UserController } from './user.controller';
 import { UserPublicController } from './user.public.controller';
 import { SharedModule } from '../shared/shared.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../database/entities/user.entity';
+import { User } from '../../database/entities/user.entity';
 import { JwtStrategy } from 'src/strategy';
 import { JwtModule } from '@nestjs/jwt';
 

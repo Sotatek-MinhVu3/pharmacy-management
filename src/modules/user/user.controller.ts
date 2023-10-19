@@ -19,7 +19,7 @@ import { plainToClass } from 'class-transformer';
 import { GetProfileDto } from '../shared/dtos/user/response.dto';
 import { RoleGuard } from 'src/guards/role.guard';
 import { ERole } from '../shared/constants';
-import { User } from '../database/entities/user.entity';
+import { User } from '../../database/entities/user.entity';
 
 @Controller('user')
 @UseGuards(CustomAuthGuard)
