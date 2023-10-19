@@ -1,7 +1,7 @@
 require('dotenv').config();
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../database/entities/user.entity';
+import { User } from '../../database/entities/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
