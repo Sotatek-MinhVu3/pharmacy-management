@@ -14,6 +14,7 @@ import {
 import { UserService } from './user.service';
 import {
   CreateBranchAdminDto,
+  CreateStaffDto,
   CreateUserDto,
   UpdateUserDto,
 } from '../shared/dtos/user/request.dto';
@@ -40,24 +41,38 @@ export class UserController {
   @Get('branch-admin')
   @UseGuards(new RoleGuard([ERole.ADMIN]))
   async getAllBranchAdmin() {
-    return await this.userService.getAll(ERole.BRANCH_ADMIN);
+    return await this.userService.getAllByRole(ERole.BRANCH_ADMIN);
   }
 
   @Post('/staff')
   @UseGuards(new RoleGuard([ERole.BRANCH_ADMIN]))
-  async createStaff(@Body() reqBody: CreateUserDto) {
-    return await this.userService.createStaff(reqBody);
+  async createStaff(@Body() reqBody: CreateStaffDto, @Req() request: Request) {
+    const { branchId } = plainToClass(GetProfileDto, request.user, {
+      excludeExtraneousValues: true,
+    });
+    return await this.userService.createStaff(reqBody, branchId);
+  }
+
+  @Post('/create-customer')
+  @UseGuards(new RoleGuard([ERole.STAFF]))
+  async register(@Body() reqBody: CreateUserDto) {
+    return await this.userService.register(reqBody);
   }
 
   @Get()
   @UseGuards(new RoleGuard([ERole.ADMIN]))
   async getAllUsers() {
-    return await this.userService.getAll(ERole.USER);
+    return await this.userService.getAll();
   }
 
   @Get('/profile')
   @UseGuards(
-    new RoleGuard([ERole.USER, ERole.STAFF, ERole.BRANCH_ADMIN, ERole.ADMIN]),
+    new RoleGuard([
+      ERole.CUSTOMER,
+      ERole.STAFF,
+      ERole.BRANCH_ADMIN,
+      ERole.ADMIN,
+    ]),
   )
   async getProfile(@Req() request: Request) {
     return plainToClass(GetProfileDto, request.user, {
@@ -67,16 +82,27 @@ export class UserController {
 
   @Put('/profile')
   @UseGuards(
-    new RoleGuard([ERole.USER, ERole.STAFF, ERole.BRANCH_ADMIN, ERole.ADMIN]),
+    new RoleGuard([
+      ERole.CUSTOMER,
+      ERole.STAFF,
+      ERole.BRANCH_ADMIN,
+      ERole.ADMIN,
+    ]),
   )
   async updateProfile(@Req() request: Request, @Body() reqBody: UpdateUserDto) {
     const user = plainToClass(User, request.user);
     return await this.userService.updateUser(user.id, reqBody);
   }
 
-  @Delete('/:id')
+  @Put('/activate/:id')
   @UseGuards(new RoleGuard([ERole.ADMIN]))
-  async deleteUser(@Param('id') id: number) {
-    return await this.userService.deleteUser(id);
+  async activateCustomer(@Param('id') id: number) {
+    return await this.userService.activateCustomer(id);
+  }
+
+  @Put('/deactivate/:id')
+  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  async deactivateCustomer(@Param('id') id: number) {
+    return await this.userService.deactivateCustomer(id);
   }
 }

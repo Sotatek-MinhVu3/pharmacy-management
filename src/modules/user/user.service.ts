@@ -8,11 +8,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
   CreateBranchAdminDto,
+  CreateStaffDto,
   CreateUserDto,
   LoginUserDto,
   UpdateUserDto,
 } from '../shared/dtos/user/request.dto';
-import { ERole } from '../shared/constants';
+import { ERole, EUserStatus } from '../shared/constants';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/database/entities/user.entity';
@@ -25,19 +26,19 @@ export class UserService {
   ) {}
 
   async register(reqBody: CreateUserDto) {
-    const newUser = await this.create(reqBody, ERole.USER);
+    const newUser = await this.create(reqBody, ERole.CUSTOMER);
     await this.userRepo.save(newUser);
 
     const access_token = await this.generateAccessToken(newUser);
 
     return {
-      msg: 'User has been created successfully',
+      msg: 'Customer has been created successfully',
       access_token,
     };
   }
 
   async createBranchAdmin(reqBody: CreateBranchAdminDto) {
-    const branchAdmins = await this.getAll(ERole.BRANCH_ADMIN);
+    const branchAdmins = await this.getAllByRole(ERole.BRANCH_ADMIN);
     const existedBranchAdmins = branchAdmins.filter(
       (bra) => bra.branchId === reqBody.branchId,
     );
@@ -55,8 +56,9 @@ export class UserService {
     };
   }
 
-  async createStaff(reqBody: CreateUserDto) {
+  async createStaff(reqBody: CreateStaffDto, branchId: number) {
     const newStaff = await this.create(reqBody, ERole.STAFF);
+    newStaff.branchId = branchId;
     await this.userRepo.save(newStaff);
 
     const access_token = await this.generateAccessToken(newStaff);
@@ -67,8 +69,12 @@ export class UserService {
     };
   }
 
-  async getAll(role: ERole) {
+  async getAllByRole(role: ERole) {
     return await this.userRepo.find({ where: { role } });
+  }
+
+  async getAll() {
+    return await this.userRepo.find();
   }
 
   async getUserByEmail(email: string) {
@@ -83,14 +89,31 @@ export class UserService {
     return user;
   }
 
-  async deleteUser(id: number) {
+  async activateCustomer(id: number) {
     const user = await this.userRepo.findOneBy({ id });
     if (!user) {
       throw new NotFoundException('User not found!');
     }
-    await this.userRepo.softDelete(id);
+    if (user.status === EUserStatus.ACTIVE) {
+      throw new BadRequestException('Customer is already active!');
+    }
+    await this.userRepo.save({ ...user, status: EUserStatus.ACTIVE });
     return {
-      message: 'Deleted user successfully!',
+      message: 'Activated customer!',
+    };
+  }
+
+  async deactivateCustomer(id: number) {
+    const user = await this.userRepo.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
+    if (user.status === EUserStatus.INACTIVE) {
+      throw new BadRequestException('Customer is already deactivated!');
+    }
+    await this.userRepo.save({ ...user, status: EUserStatus.INACTIVE });
+    return {
+      message: 'Deactivated customer!',
     };
   }
 

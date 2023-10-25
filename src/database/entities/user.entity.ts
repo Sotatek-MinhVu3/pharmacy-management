@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { ERole } from 'src/modules/shared/constants';
+import { ERole, EUserStatus } from 'src/modules/shared/constants';
 import {
   Entity,
   Column,
@@ -30,9 +30,14 @@ export class User {
   lastName: string;
 
   @Column({
-    default: ERole.USER,
+    default: ERole.CUSTOMER,
   })
   role: ERole;
+
+  @Column({
+    default: EUserStatus.ACTIVE,
+  })
+  status: EUserStatus;
 
   @Column({
     nullable: true,
