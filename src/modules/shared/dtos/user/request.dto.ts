@@ -18,6 +18,24 @@ export class CreateUserDto {
   phone: string;
 }
 
+export class CreateStaffDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
+
+  @IsNotEmpty()
+  firstName: string;
+
+  @IsNotEmpty()
+  lastName: string;
+
+  @IsNotEmpty()
+  phone: string;
+}
+
 export class CreateBranchAdminDto {
   @IsNotEmpty()
   @IsEmail()

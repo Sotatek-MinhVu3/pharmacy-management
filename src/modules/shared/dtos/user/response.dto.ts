@@ -1,4 +1,5 @@
 import { Expose } from 'class-transformer';
+import { EUserStatus } from '../../constants';
 
 export class GetProfileDto {
   @Expose()
@@ -12,4 +13,10 @@ export class GetProfileDto {
 
   @Expose()
   phone: string;
+
+  @Expose()
+  branchId: number;
+
+  @Expose()
+  status: EUserStatus;
 }
