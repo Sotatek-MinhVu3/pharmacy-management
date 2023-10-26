@@ -39,7 +39,7 @@ export class SupplierController {
   @Put('/:id')
   @UseGuards(new RoleGuard([ERole.ADMIN]))
   async updateSupplier(
-    @Param() id: number,
+    @Param('id') id: number,
     @Body() reqBody: UpdateSupplierDto,
   ) {
     return await this.supplierService.updateSupplier(id, reqBody);
