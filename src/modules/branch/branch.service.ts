@@ -14,8 +14,8 @@ export class BranchService {
   ) {}
 
   async create(reqBody: CreateBranchDto) {
-    const newUser = this.branchRepo.create(reqBody);
-    return await this.branchRepo.save(newUser);
+    const newBranch = this.branchRepo.create(reqBody);
+    return await this.branchRepo.save(newBranch);
   }
 
   async getAllBranches() {
@@ -31,11 +31,8 @@ export class BranchService {
   }
 
   async deleteBranch(branchId: number) {
-    const branch = await this.branchRepo.findOneBy({ id: branchId });
-    if (!branch) {
-      throw new NotFoundException('Branch not found!');
-    }
-    await this.branchRepo.softDelete(branchId);
+    const branch = await this.getBranchById(branchId);
+    await this.branchRepo.softDelete(branch.id);
     return {
       message: 'Deleted branch successfully!',
     };
