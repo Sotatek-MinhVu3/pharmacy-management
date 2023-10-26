@@ -15,7 +15,10 @@ export class BranchService {
 
   async create(reqBody: CreateBranchDto) {
     const newBranch = this.branchRepo.create(reqBody);
-    return await this.branchRepo.save(newBranch);
+    await this.branchRepo.save(newBranch);
+    return {
+      message: 'Branch has been created successfully!',
+    };
   }
 
   async getAllBranches() {
