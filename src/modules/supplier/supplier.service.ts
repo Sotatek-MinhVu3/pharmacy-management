@@ -28,7 +28,7 @@ export class SupplierService {
     const newSupplier = this.supplierRepo.create(reqBody);
     await this.supplierRepo.save(newSupplier);
     return {
-      msg: 'Created supplier!',
+      message: 'Created supplier!',
     };
   }
 
