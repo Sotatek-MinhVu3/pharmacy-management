@@ -37,9 +37,18 @@ export class BranchController {
     return await this.branchService.getAllBranches();
   }
 
+  @Get('/:id')
+  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  async getBranchById(@Param('id') id: number) {
+    return await this.branchService.getBranchById(id);
+  }
+
   @Put('/:id')
   @UseGuards(new RoleGuard([ERole.ADMIN]))
-  async updateBranch(@Param() id: number, @Body() reqBody: UpdateBranchDto) {
+  async updateBranch(
+    @Param('id') id: number,
+    @Body() reqBody: UpdateBranchDto,
+  ) {
     return await this.branchService.updateBranch(id, reqBody);
   }
 
