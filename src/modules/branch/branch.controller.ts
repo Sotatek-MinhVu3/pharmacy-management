@@ -3,7 +3,6 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Delete,
-  Get,
   Param,
   Post,
   Put,
@@ -29,18 +28,6 @@ export class BranchController {
   @UseGuards(new RoleGuard([ERole.ADMIN]))
   async createBranch(@Body() reqBody: CreateBranchDto) {
     return await this.branchService.create(reqBody);
-  }
-
-  @Get()
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
-  async getAllBranches() {
-    return await this.branchService.getAllBranches();
-  }
-
-  @Get('/:id')
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
-  async getBranchById(@Param('id') id: number) {
-    return await this.branchService.getBranchById(id);
   }
 
   @Put('/:id')
