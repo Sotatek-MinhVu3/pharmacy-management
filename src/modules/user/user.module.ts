@@ -1,3 +1,4 @@
+require('dotenv').config();
 import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
@@ -11,7 +12,7 @@ import { JwtModule } from '@nestjs/jwt';
     SharedModule,
     JwtModule.register({
       global: true,
-      signOptions: { expiresIn: '15m' },
+      signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
     }),
   ],
   providers: [UserService, JwtStrategy],
