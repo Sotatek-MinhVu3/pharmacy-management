@@ -40,6 +40,7 @@ export class ProductService {
       unit: reqBody.unit,
       barcode: reqBody.barcode,
       size: reqBody.size,
+      price: reqBody.price,
     };
     const newProduct = this.productRepo.create(product);
     await this.productRepo.save(newProduct);
