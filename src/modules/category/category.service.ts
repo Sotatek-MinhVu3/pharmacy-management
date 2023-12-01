@@ -5,13 +5,13 @@ import {
   CreateCategoryDto,
   UpdateCategoryDto,
 } from '../shared/dtos/category/request.dto';
-import { Category } from 'src/database/entities/category.entity';
+import { CategoryEntity } from 'src/database/entities/category.entity';
 
 @Injectable()
 export class CategoryService {
   constructor(
-    @InjectRepository(Category)
-    private readonly categoryRepo: Repository<Category>,
+    @InjectRepository(CategoryEntity)
+    private readonly categoryRepo: Repository<CategoryEntity>,
   ) {}
 
   async create(reqBody: CreateCategoryDto) {

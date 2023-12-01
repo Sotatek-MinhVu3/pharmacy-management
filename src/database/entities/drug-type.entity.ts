@@ -1,13 +1,16 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
-export class ProductType {
+@Entity({ name: 'types' })
+export class DrugTypeEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ name: 'category_id' })
   categoryId: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
+
+  @Column({ unique: true })
+  slug: string;
 }

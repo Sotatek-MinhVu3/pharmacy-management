@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ProductType } from 'src/database/entities/product-type.entity';
+import { DrugTypeEntity } from 'src/database/entities/drug-type.entity';
 import {
   CreateProductTypeDto,
   UpdateProductTypeDto,
@@ -10,8 +10,8 @@ import {
 @Injectable()
 export class ProductTypeService {
   constructor(
-    @InjectRepository(ProductType)
-    private readonly productTypeRepo: Repository<ProductType>,
+    @InjectRepository(DrugTypeEntity)
+    private readonly productTypeRepo: Repository<DrugTypeEntity>,
   ) {}
 
   async create(reqBody: CreateProductTypeDto) {

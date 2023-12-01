@@ -16,12 +16,13 @@ import {
 import { ERole, EUserStatus } from '../shared/constants';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/database/entities/user.entity';
+import { UserEntity } from 'src/database/entities/user.entity';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepo: Repository<UserEntity>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -156,7 +157,7 @@ export class UserService {
     };
   }
 
-  private async generateAccessToken(user: User) {
+  private async generateAccessToken(user: UserEntity) {
     const payload = {
       id: user.id,
       email: user.email,

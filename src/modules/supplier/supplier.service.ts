@@ -9,13 +9,13 @@ import {
   CreateSupplierDto,
   UpdateSupplierDto,
 } from '../shared/dtos/supplier/request.dto';
-import { Supplier } from 'src/database/entities/supplier.entity';
+import { SupplierEntity } from 'src/database/entities/supplier.entity';
 
 @Injectable()
 export class SupplierService {
   constructor(
-    @InjectRepository(Supplier)
-    private readonly supplierRepo: Repository<Supplier>,
+    @InjectRepository(SupplierEntity)
+    private readonly supplierRepo: Repository<SupplierEntity>,
   ) {}
 
   async create(reqBody: CreateSupplierDto) {

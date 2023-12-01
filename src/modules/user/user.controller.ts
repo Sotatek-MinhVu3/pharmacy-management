@@ -24,7 +24,7 @@ import { plainToClass } from 'class-transformer';
 import { GetProfileDto } from '../shared/dtos/user/response.dto';
 import { RoleGuard } from 'src/guards/role.guard';
 import { ERole } from '../shared/constants';
-import { User } from '../../database/entities/user.entity';
+import { UserEntity } from '../../database/entities/user.entity';
 
 @Controller('user')
 @UseGuards(CustomAuthGuard)
@@ -90,7 +90,7 @@ export class UserController {
     ]),
   )
   async updateProfile(@Req() request: Request, @Body() reqBody: UpdateUserDto) {
-    const user = plainToClass(User, request.user);
+    const user = plainToClass(UserEntity, request.user);
     return await this.userService.updateUser(user.id, reqBody);
   }
 

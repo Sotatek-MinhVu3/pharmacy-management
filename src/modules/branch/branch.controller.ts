@@ -3,6 +3,7 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   Put,
@@ -19,19 +20,28 @@ import {
 } from '../shared/dtos/branch/request.dto';
 
 @Controller('branch')
-@UseGuards(CustomAuthGuard)
 @UseInterceptors(ClassSerializerInterceptor)
 export class BranchController {
   constructor(private branchService: BranchService) {}
 
   @Post('/create')
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async createBranch(@Body() reqBody: CreateBranchDto) {
     return await this.branchService.create(reqBody);
   }
 
+  @Get()
+  async getAllBranches() {
+    return await this.branchService.getAllBranches();
+  }
+
+  @Get('/:id')
+  async getBranchById(@Param('id') id: number) {
+    return await this.branchService.getBranchById(id);
+  }
+
   @Put('/:id')
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async updateBranch(
     @Param('id') id: number,
     @Body() reqBody: UpdateBranchDto,
@@ -40,7 +50,7 @@ export class BranchController {
   }
 
   @Delete('/:id')
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async deleteBranch(@Param('id') id: number) {
     return await this.branchService.deleteBranch(id);
   }

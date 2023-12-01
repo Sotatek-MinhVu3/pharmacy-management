@@ -5,23 +5,20 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Product } from 'src/database/entities/product.entity';
-import {
-  CreateProductDto,
-  UpdateProductDto,
-} from '../shared/dtos/product/request.dto';
+import { DrugEntity } from 'src/database/entities/product.entity';
+import { CreateDrugDto, UpdateDrugDto } from '../shared/dtos/drug/request.dto';
 import { ProductTypeService } from '../category/product-type/product-type.service';
 
 @Injectable()
-export class ProductService {
+export class DrugService {
   constructor(
-    @InjectRepository(Product)
-    private readonly productRepo: Repository<Product>,
-    private readonly productTypeService: ProductTypeService,
+    @InjectRepository(DrugEntity)
+    private readonly drugRepo: Repository<DrugEntity>,
+    private readonly drugTypeService: ProductTypeService,
   ) {}
 
-  async create(reqBody: CreateProductDto) {
-    const existedProduct = await this.productRepo.findOneBy({
+  async create(reqBody: CreateDrugDto) {
+    const existedProduct = await this.drugRepo.findOneBy({
       barcode: reqBody.barcode,
     });
     if (existedProduct) {
@@ -42,8 +39,8 @@ export class ProductService {
       size: reqBody.size,
       price: reqBody.price,
     };
-    const newProduct = this.productRepo.create(product);
-    await this.productRepo.save(newProduct);
+    const newProduct = this.drugRepo.create(product);
+    await this.drugRepo.save(newProduct);
     return {
       message: 'Created product!',
     };
@@ -51,18 +48,18 @@ export class ProductService {
 
   async getAll(isManager: boolean) {
     if (isManager) {
-      return await this.productRepo.find();
+      return await this.drugRepo.find();
     } else {
-      return await this.productRepo.find({ where: { soldAsDose: false } });
+      return await this.drugRepo.find({ where: { soldAsDose: false } });
     }
   }
 
   async getAllByCategory(categoryId: number, isManager: boolean) {
     const productTypes =
-      await this.productTypeService.getAllByCategoryId(categoryId);
+      await this.drugTypeService.getAllByCategoryId(categoryId);
     let products = [];
     for (let productType of productTypes) {
-      const productsByType = await this.getAllByProductType(
+      const productsByType = await this.getAllByDrugType(
         productType.id,
         isManager,
       );
@@ -71,58 +68,58 @@ export class ProductService {
     return products.flat();
   }
 
-  async getAllByProductType(typeId: number, isManager: boolean) {
-    let products: Product[];
+  async getAllByDrugType(typeId: number, isManager: boolean) {
+    let drugs: DrugEntity[];
     if (isManager) {
-      products = await this.productRepo.find({
+      drugs = await this.drugRepo.find({
         where: { typeId },
       });
     } else {
-      products = await this.productRepo.find({
+      drugs = await this.drugRepo.find({
         where: { typeId, soldAsDose: false },
       });
     }
-    if (!products.length) {
+    if (!drugs.length) {
       return [];
-    } else return products;
+    } else return drugs;
   }
 
-  async getProductById(id: number, isManager: boolean) {
-    let product: Product;
+  async getDrugById(id: number, isManager: boolean) {
+    let drug: DrugEntity;
     if (isManager) {
-      product = await this.productRepo.findOneBy({ id });
+      drug = await this.drugRepo.findOneBy({ id });
     } else {
-      product = await this.productRepo.findOneBy({ id, soldAsDose: false });
+      drug = await this.drugRepo.findOneBy({ id, soldAsDose: false });
     }
+    if (!drug) {
+      throw new NotFoundException('Drug not found!');
+    }
+    return drug;
+  }
+
+  async getDrugByBarcode(barcode: number) {
+    const product = await this.drugRepo.findOneBy({ barcode });
     if (!product) {
-      throw new NotFoundException('Product not found!');
+      throw new NotFoundException('Drug not found!');
     }
     return product;
   }
 
-  async getProductByBarcode(barcode: number) {
-    const product = await this.productRepo.findOneBy({ barcode });
-    if (!product) {
-      throw new NotFoundException('Product not found!');
-    }
-    return product;
-  }
-
-  async updateProduct(id: number, reqBody: UpdateProductDto) {
-    let product = await this.getProductById(id, true);
+  async updateProduct(id: number, reqBody: UpdateDrugDto) {
+    let product = await this.getDrugById(id, true);
     const sensitiveIngredients = reqBody.sensitiveIngredients
       ? JSON.stringify(reqBody.sensitiveIngredients)
       : null;
     product = { ...product, ...reqBody, sensitiveIngredients };
-    await this.productRepo.save(product);
+    await this.drugRepo.save(product);
     return {
       message: 'Updated product!',
     };
   }
 
   async deleteProduct(id: number) {
-    let product = await this.getProductById(id, true);
-    await this.productRepo.softDelete(id);
+    let product = await this.getDrugById(id, true);
+    await this.drugRepo.softDelete(id);
     return {
       message: 'Deleted product!',
     };

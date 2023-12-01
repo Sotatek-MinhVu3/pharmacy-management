@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { EProductUnit } from 'src/modules/shared/constants';
+import { EDrugUnit } from 'src/modules/shared/constants';
 import {
   Entity,
   Column,
@@ -8,8 +8,8 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
-@Entity()
-export class Product {
+@Entity({ name: 'drugs' })
+export class DrugEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -40,7 +40,7 @@ export class Product {
   description: string;
 
   @Column()
-  unit: EProductUnit;
+  unit: EDrugUnit;
 
   @Column()
   barcode: number;

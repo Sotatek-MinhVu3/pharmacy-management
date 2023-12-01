@@ -10,7 +10,7 @@ export enum EUserStatus {
   INACTIVE = 'inactive',
 }
 
-export enum EProductUnit {
+export enum EDrugUnit {
   BOTTLE = 'bottle',
   BOX = 'box',
   TUBE = 'tube',

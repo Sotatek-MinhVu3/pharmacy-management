@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Branch } from '../../database/entities/branch.entity';
+import { BranchEntity } from '../../database/entities/branch.entity';
 import {
   CreateBranchDto,
   UpdateBranchDto,
@@ -10,7 +10,8 @@ import {
 @Injectable()
 export class BranchService {
   constructor(
-    @InjectRepository(Branch) private readonly branchRepo: Repository<Branch>,
+    @InjectRepository(BranchEntity)
+    private readonly branchRepo: Repository<BranchEntity>,
   ) {}
 
   async create(reqBody: CreateBranchDto) {

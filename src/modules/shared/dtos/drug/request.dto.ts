@@ -8,9 +8,9 @@ import {
   IsNotEmpty,
   IsPositive,
 } from 'class-validator';
-import { EProductUnit } from '../../constants';
+import { EDrugUnit } from '../../constants';
 
-export class CreateProductDto {
+export class CreateDrugDto {
   @IsNotEmpty()
   name: string;
 
@@ -36,8 +36,8 @@ export class CreateProductDto {
   description: string;
 
   @IsNotEmpty()
-  @IsEnum(EProductUnit)
-  unit: EProductUnit;
+  @IsEnum(EDrugUnit)
+  unit: EDrugUnit;
 
   @IsNotEmpty()
   @IsInt()
@@ -55,7 +55,7 @@ export class CreateProductDto {
   size: number;
 }
 
-export class UpdateProductDto {
+export class UpdateDrugDto {
   name?: string;
 
   dueDate?: Date;
@@ -74,8 +74,8 @@ export class UpdateProductDto {
 
   description?: string;
 
-  @IsEnum(EProductUnit)
-  unit?: EProductUnit;
+  @IsEnum(EDrugUnit)
+  unit?: EDrugUnit;
 
   @IsInt()
   @IsPositive()
