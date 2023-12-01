@@ -34,8 +34,8 @@ export class CategoryController {
   @Post('/seed')
   @UseGuards(new RoleGuard([ERole.ADMIN]))
   async seedCategories() {
-    for (let category of categories) {
-      await this.categoryService.create(category);
+    for (let category of categories.entries()) {
+      await this.categoryService.create(category[1]);
     }
   }
 
@@ -72,8 +72,8 @@ export class CategoryController {
   @Post('/drug-types/seed')
   @UseGuards(new RoleGuard([ERole.ADMIN]))
   async seedDrugTypes() {
-    for (let drugType of drugTypes) {
-      await this.drugTypeService.create(drugType);
+    for (let drugType of drugTypes.entries()) {
+      await this.drugTypeService.create(drugType[1]);
     }
   }
 
