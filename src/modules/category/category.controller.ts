@@ -3,7 +3,7 @@ import { CustomAuthGuard } from 'src/guards/custom-auth.guard';
 import { RoleGuard } from 'src/guards/role.guard';
 import { ERole } from '../shared/constants';
 import { CategoryService } from './category.service';
-import { ProductTypeService } from './product-type/product-type.service';
+import { DrugTypeService } from './drug-type/drug-type.service';
 import { UpdateCategoryDto } from '../shared/dtos/category/request.dto';
 import { UpdateProductTypeDto } from '../shared/dtos/product-type/request.dto';
 
@@ -12,7 +12,7 @@ import { UpdateProductTypeDto } from '../shared/dtos/product-type/request.dto';
 export class CategoryController {
   constructor(
     private categoryService: CategoryService,
-    private productTypeService: ProductTypeService,
+    private productTypeService: DrugTypeService,
   ) {}
 
   @Put('/:id/')

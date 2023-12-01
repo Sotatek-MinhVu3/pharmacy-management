@@ -19,9 +19,6 @@ export class DrugEntity {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @Column({ name: 'due_date' })
-  dueDate: Date;
-
   @Column({
     name: 'type_id',
   })

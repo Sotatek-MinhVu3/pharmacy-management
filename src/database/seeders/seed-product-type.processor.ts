@@ -1,7 +1,7 @@
 import { Injectable, Module } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { CategoryModule } from 'src/modules/category/category.module';
-import { ProductTypeService } from 'src/modules/category/product-type/product-type.service';
+import { DrugTypeService } from 'src/modules/category/drug-type/drug-type.service';
 import { SharedModule } from 'src/modules/shared/shared.module';
 
 const productTypes = [
@@ -50,26 +50,26 @@ const productTypes = [
 
 @Injectable()
 class ProductTypeSeeder {
-  constructor(private readonly productTypeService: ProductTypeService) {}
+  constructor(private readonly drugTypeService: DrugTypeService) {}
   seed() {
     productTypes.forEach(async (category) => {
-      await this.productTypeService.create(category);
+      await this.drugTypeService.create(category);
     });
   }
 }
 
 @Module({
-  imports: [SharedModule, ProductTypeSeederModule, CategoryModule],
-  providers: [ProductTypeSeeder, ProductTypeService],
+  imports: [SharedModule, DrugTypeSeederModule, CategoryModule],
+  providers: [ProductTypeSeeder, DrugTypeService],
 })
-class ProductTypeSeederModule {
+class DrugTypeSeederModule {
   constructor(private readonly categorySeeder: ProductTypeSeeder) {
     this.categorySeeder.seed();
   }
 }
 
 const run = async () => {
-  const consumer = await NestFactory.create(ProductTypeSeederModule);
+  const consumer = await NestFactory.create(DrugTypeSeederModule);
   await consumer.init();
 };
 
