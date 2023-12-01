@@ -48,14 +48,13 @@ export class DrugService {
   }
 
   async getAllByCategory(categoryId: number, isManager: boolean) {
-    const productTypes =
-      await this.drugTypeService.getAllByCategoryId(categoryId);
-    let products = [];
-    for (let productType of productTypes) {
-      const productsByType = await this.getAllByDrugType(productType.id);
-      products.push(productsByType);
+    const drugTypes = await this.drugTypeService.getAllByCategoryId(categoryId);
+    let drugs = [];
+    for (let drugType of drugTypes) {
+      const drugsByType = await this.getAllByDrugType(drugType.id);
+      drugs.push(drugsByType);
     }
-    return products.flat();
+    return drugs.flat();
   }
 
   async getAllByDrugType(typeId: number) {
@@ -80,30 +79,27 @@ export class DrugService {
   }
 
   async getDrugByBarcode(barcode: number) {
-    const product = await this.drugRepo.findOneBy({ barcode });
-    if (!product) {
+    const drug = await this.drugRepo.findOneBy({ barcode });
+    if (!drug) {
       throw new NotFoundException('Drug not found!');
     }
-    return product;
+    return drug;
   }
 
-  async updateProduct(id: number, reqBody: UpdateDrugDto) {
-    let product = await this.getDrugById(id);
+  async updateDrug(id: number, reqBody: UpdateDrugDto) {
+    let drug = await this.getDrugById(id);
     const sensitiveIngredients = reqBody.sensitiveIngredients
       ? JSON.stringify(reqBody.sensitiveIngredients)
       : null;
-    product = { ...product, ...reqBody, sensitiveIngredients };
-    await this.drugRepo.save(product);
-    return {
-      message: 'Updated product!',
-    };
+    drug = { ...drug, ...reqBody, sensitiveIngredients };
+    return await this.drugRepo.save(drug);
   }
 
-  async deleteProduct(id: number) {
-    let product = await this.getDrugById(id);
+  async deleteDrug(id: number) {
+    let drug = await this.getDrugById(id);
     await this.drugRepo.softDelete(id);
     return {
-      message: 'Deleted product!',
+      message: 'Deleted drug!',
     };
   }
 }
