@@ -7,7 +7,7 @@ import { DrugTypeService } from './drug-type/drug-type.service';
 import { UpdateCategoryDto } from '../shared/dtos/category/request.dto';
 import { UpdateProductTypeDto } from '../shared/dtos/product-type/request.dto';
 
-@Controller('category')
+@Controller('categories')
 @UseGuards(CustomAuthGuard)
 export class CategoryController {
   constructor(
