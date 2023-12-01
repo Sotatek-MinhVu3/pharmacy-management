@@ -22,7 +22,7 @@ export class DrugTypeService {
   async create(reqBody: CreateDrugTypeDto) {
     const slug = slugify(reqBody.name);
     const existedDrugType = await this.getDrugTypeBySlug(slug);
-    if (!existedDrugType) {
+    if (existedDrugType) {
       throw new BadRequestException('Drug type existed!');
     }
     const newDrugType = this.drugTypeRepo.create({ ...reqBody, slug });
