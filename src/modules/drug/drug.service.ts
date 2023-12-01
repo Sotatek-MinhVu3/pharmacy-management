@@ -5,28 +5,27 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { DrugEntity } from 'src/database/entities/product.entity';
+import { DrugEntity } from 'src/database/entities/drug.entity';
 import { CreateDrugDto, UpdateDrugDto } from '../shared/dtos/drug/request.dto';
-import { ProductTypeService } from '../category/product-type/product-type.service';
+import { DrugTypeService } from '../category/drug-type/drug-type.service';
 
 @Injectable()
 export class DrugService {
   constructor(
     @InjectRepository(DrugEntity)
     private readonly drugRepo: Repository<DrugEntity>,
-    private readonly drugTypeService: ProductTypeService,
+    private readonly drugTypeService: DrugTypeService,
   ) {}
 
   async create(reqBody: CreateDrugDto) {
-    const existedProduct = await this.drugRepo.findOneBy({
+    const existedDrug = await this.drugRepo.findOneBy({
       barcode: reqBody.barcode,
     });
-    if (existedProduct) {
-      throw new BadRequestException('Product existed!');
+    if (existedDrug) {
+      throw new BadRequestException('Drug existed!');
     }
-    const product = {
+    const drug = {
       name: reqBody.name,
-      dueDate: reqBody.dueDate,
       typeId: reqBody.typeId,
       supplierId: reqBody.supplierId,
       soldAsDose: reqBody.soldAsDose,
@@ -39,19 +38,13 @@ export class DrugService {
       size: reqBody.size,
       price: reqBody.price,
     };
-    const newProduct = this.drugRepo.create(product);
-    await this.drugRepo.save(newProduct);
-    return {
-      message: 'Created product!',
-    };
+    const newDrug = this.drugRepo.create(drug);
+    await this.drugRepo.save(newDrug);
+    return newDrug;
   }
 
-  async getAll(isManager: boolean) {
-    if (isManager) {
-      return await this.drugRepo.find();
-    } else {
-      return await this.drugRepo.find({ where: { soldAsDose: false } });
-    }
+  async getAll() {
+    return await this.drugRepo.find();
   }
 
   async getAllByCategory(categoryId: number, isManager: boolean) {
@@ -59,38 +52,27 @@ export class DrugService {
       await this.drugTypeService.getAllByCategoryId(categoryId);
     let products = [];
     for (let productType of productTypes) {
-      const productsByType = await this.getAllByDrugType(
-        productType.id,
-        isManager,
-      );
+      const productsByType = await this.getAllByDrugType(productType.id);
       products.push(productsByType);
     }
     return products.flat();
   }
 
-  async getAllByDrugType(typeId: number, isManager: boolean) {
+  async getAllByDrugType(typeId: number) {
     let drugs: DrugEntity[];
-    if (isManager) {
-      drugs = await this.drugRepo.find({
-        where: { typeId },
-      });
-    } else {
-      drugs = await this.drugRepo.find({
-        where: { typeId, soldAsDose: false },
-      });
-    }
+    drugs = await this.drugRepo.find({
+      where: { typeId },
+    });
+
     if (!drugs.length) {
       return [];
     } else return drugs;
   }
 
-  async getDrugById(id: number, isManager: boolean) {
+  async getDrugById(id: number) {
     let drug: DrugEntity;
-    if (isManager) {
-      drug = await this.drugRepo.findOneBy({ id });
-    } else {
-      drug = await this.drugRepo.findOneBy({ id, soldAsDose: false });
-    }
+    drug = await this.drugRepo.findOneBy({ id });
+
     if (!drug) {
       throw new NotFoundException('Drug not found!');
     }
@@ -106,7 +88,7 @@ export class DrugService {
   }
 
   async updateProduct(id: number, reqBody: UpdateDrugDto) {
-    let product = await this.getDrugById(id, true);
+    let product = await this.getDrugById(id);
     const sensitiveIngredients = reqBody.sensitiveIngredients
       ? JSON.stringify(reqBody.sensitiveIngredients)
       : null;
@@ -118,7 +100,7 @@ export class DrugService {
   }
 
   async deleteProduct(id: number) {
-    let product = await this.getDrugById(id, true);
+    let product = await this.getDrugById(id);
     await this.drugRepo.softDelete(id);
     return {
       message: 'Deleted product!',

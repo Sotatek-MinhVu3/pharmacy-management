@@ -8,7 +8,7 @@ import {
 } from 'src/modules/shared/dtos/product-type/request.dto';
 
 @Injectable()
-export class ProductTypeService {
+export class DrugTypeService {
   constructor(
     @InjectRepository(DrugTypeEntity)
     private readonly productTypeRepo: Repository<DrugTypeEntity>,

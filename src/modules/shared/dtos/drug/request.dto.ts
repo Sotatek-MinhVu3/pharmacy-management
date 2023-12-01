@@ -15,9 +15,6 @@ export class CreateDrugDto {
   name: string;
 
   @IsNotEmpty()
-  dueDate: Date;
-
-  @IsNotEmpty()
   @IsInt()
   @IsPositive()
   typeId: number;
@@ -57,8 +54,6 @@ export class CreateDrugDto {
 
 export class UpdateDrugDto {
   name?: string;
-
-  dueDate?: Date;
 
   @IsInt()
   @IsPositive()

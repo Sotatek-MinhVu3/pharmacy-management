@@ -16,50 +16,45 @@ import { ERole } from '../shared/constants';
 import { CreateDrugDto, UpdateDrugDto } from '../shared/dtos/drug/request.dto';
 import { CustomAuthGuard } from 'src/guards/custom-auth.guard';
 
-@Controller('product')
-@UseGuards(CustomAuthGuard)
+@Controller('drugs')
 @UseInterceptors(ClassSerializerInterceptor)
 export class DrugController {
   constructor(private drugService: DrugService) {}
 
   @Post('/create')
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async createProduct(@Body() reqBody: CreateDrugDto) {
     return await this.drugService.create(reqBody);
   }
 
   @Get('/:id')
-  @UseGuards(new RoleGuard([ERole.ADMIN, ERole.BRANCH_ADMIN, ERole.STAFF]))
   async getById(@Param('id') id: number) {
-    return await this.drugService.getDrugById(id, true);
+    return await this.drugService.getDrugById(id);
   }
 
   @Get('/category/:id')
-  @UseGuards(new RoleGuard([ERole.ADMIN, ERole.BRANCH_ADMIN, ERole.STAFF]))
   async getAllByCategory(@Param('id') id: number) {
     return await this.drugService.getAllByCategory(id, true);
   }
 
   @Get('/product-type/:id')
-  @UseGuards(new RoleGuard([ERole.ADMIN, ERole.BRANCH_ADMIN, ERole.STAFF]))
   async getAllByProductType(@Param('id') id: number) {
-    return await this.drugService.getAllByDrugType(id, true);
+    return await this.drugService.getAllByDrugType(id);
   }
 
   @Get()
-  @UseGuards(new RoleGuard([ERole.ADMIN, ERole.BRANCH_ADMIN, ERole.STAFF]))
   async getAll() {
-    return await this.drugService.getAll(true);
+    return await this.drugService.getAll();
   }
 
   @Put('/:id')
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async updateProduct(@Param('id') id: number, @Body() reqBody: UpdateDrugDto) {
     return await this.drugService.updateProduct(id, reqBody);
   }
 
   @Delete('/:id')
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async deleteProduct(@Param('id') id: number) {
     return await this.drugService.deleteProduct(id);
   }
