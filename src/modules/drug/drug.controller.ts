@@ -37,8 +37,8 @@ export class DrugController {
     return await this.drugService.getAllByCategory(id, true);
   }
 
-  @Get('/product-type/:id')
-  async getAllByProductType(@Param('id') id: number) {
+  @Get('/drug-type/:id')
+  async getAllByDrugType(@Param('id') id: number) {
     return await this.drugService.getAllByDrugType(id);
   }
 
@@ -49,13 +49,13 @@ export class DrugController {
 
   @Put('/:id')
   @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
-  async updateProduct(@Param('id') id: number, @Body() reqBody: UpdateDrugDto) {
-    return await this.drugService.updateProduct(id, reqBody);
+  async updateDrug(@Param('id') id: number, @Body() reqBody: UpdateDrugDto) {
+    return await this.drugService.updateDrug(id, reqBody);
   }
 
   @Delete('/:id')
   @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
-  async deleteProduct(@Param('id') id: number) {
-    return await this.drugService.deleteProduct(id);
+  async deleteDrug(@Param('id') id: number) {
+    return await this.drugService.deleteDrug(id);
   }
 }
