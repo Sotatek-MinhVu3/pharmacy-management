@@ -1,45 +1,66 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DrugTypeEntity } from 'src/database/entities/drug-type.entity';
 import {
-  CreateProductTypeDto,
-  UpdateProductTypeDto,
-} from 'src/modules/shared/dtos/product-type/request.dto';
+  CreateDrugTypeDto,
+  UpdateDrugTypeDto,
+} from 'src/modules/shared/dtos/drug-type/request.dto';
+import { slugify } from 'src/utils/slug.utils';
 
 @Injectable()
 export class DrugTypeService {
   constructor(
     @InjectRepository(DrugTypeEntity)
-    private readonly productTypeRepo: Repository<DrugTypeEntity>,
+    private readonly drugTypeRepo: Repository<DrugTypeEntity>,
   ) {}
 
-  async create(reqBody: CreateProductTypeDto) {
-    const newProductType = this.productTypeRepo.create(reqBody);
-    await this.productTypeRepo.save(newProductType);
-    return {
-      message: 'Product type has been created successfully!',
-    };
+  async create(reqBody: CreateDrugTypeDto) {
+    const slug = slugify(reqBody.name);
+    const existedDrugType = await this.getDrugTypeBySlug(slug);
+    if (existedDrugType) {
+      throw new BadRequestException('Drug type existed!');
+    }
+    const newDrugType = this.drugTypeRepo.create({ ...reqBody, slug });
+    await this.drugTypeRepo.save(newDrugType);
+    return newDrugType;
+  }
+
+  async getDrugTypeBySlug(slug: string) {
+    const drugType = await this.drugTypeRepo.findOneBy({ slug });
+    if (!drugType) {
+      throw new NotFoundException('Drug type not found!');
+    }
+    return drugType;
+  }
+
+  async getDrugTypeById(id: number) {
+    const drugType = await this.drugTypeRepo.findOneBy({ id });
+    if (!drugType) {
+      throw new NotFoundException('Drug type not found!');
+    }
+    return drugType;
   }
 
   async getAllByCategoryId(categoryId: number) {
-    const types = await this.productTypeRepo.findBy({ categoryId });
+    const types = await this.drugTypeRepo.findBy({ categoryId });
     if (!types.length) {
       throw new NotFoundException('Category not found!');
     }
     return types;
   }
 
-  async updateProductType(
+  async updateDrugType(
     categoryId: number,
     id: number,
-    reqBody: UpdateProductTypeDto,
+    reqBody: UpdateDrugTypeDto,
   ) {
-    let productType = await this.productTypeRepo.findOneBy({ categoryId, id });
-    productType = { ...productType, ...reqBody };
-    await this.productTypeRepo.save(productType);
-    return {
-      message: 'Updated product type!',
-    };
+    let drugType = await this.drugTypeRepo.findOneBy({ categoryId, id });
+    drugType = { ...drugType, ...reqBody };
+    return await this.drugTypeRepo.save(drugType);
   }
 }

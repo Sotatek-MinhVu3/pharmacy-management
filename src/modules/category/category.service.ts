@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -6,6 +10,7 @@ import {
   UpdateCategoryDto,
 } from '../shared/dtos/category/request.dto';
 import { CategoryEntity } from 'src/database/entities/category.entity';
+import { slugify } from 'src/utils/slug.utils';
 
 @Injectable()
 export class CategoryService {
@@ -15,11 +20,18 @@ export class CategoryService {
   ) {}
 
   async create(reqBody: CreateCategoryDto) {
-    const newCategory = this.categoryRepo.create(reqBody);
+    const slug = slugify(reqBody.name);
+    const existedCategory = await this.getCategoryBySlug(slug);
+    if (existedCategory) {
+      throw new BadRequestException('Category existed!');
+    }
+    const newCategory = this.categoryRepo.create({ ...reqBody, slug });
     await this.categoryRepo.save(newCategory);
-    return {
-      message: 'Category has been created successfully!',
-    };
+    return newCategory;
+  }
+
+  async getCategoryBySlug(slug: string) {
+    return await this.categoryRepo.findOneBy({ slug });
   }
 
   async getCategoryById(id: number) {

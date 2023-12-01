@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
 
-export class CreateProductTypeDto {
+export class CreateDrugTypeDto {
   @IsNotEmpty()
   @IsNumber()
   categoryId: number;
@@ -9,7 +9,7 @@ export class CreateProductTypeDto {
   name: string;
 }
 
-export class UpdateProductTypeDto {
+export class UpdateDrugTypeDto {
   @IsNotEmpty()
   @IsNumber()
   categoryId: number;
