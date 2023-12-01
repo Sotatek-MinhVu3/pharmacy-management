@@ -6,8 +6,8 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 
-@Entity()
-export class Supplier {
+@Entity({ name: 'suppliers' })
+export class SupplierEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

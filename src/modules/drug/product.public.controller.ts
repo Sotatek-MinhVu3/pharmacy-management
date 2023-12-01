@@ -5,16 +5,16 @@ import {
   Param,
   UseInterceptors,
 } from '@nestjs/common';
-import { ProductService } from './product.service';
+import { DrugService } from './drug.service';
 
 @Controller('product-public')
 @UseInterceptors(ClassSerializerInterceptor)
 export class PublicProductController {
-  constructor(private productService: ProductService) {}
+  constructor(private productService: DrugService) {}
 
   @Get('/:id')
   async getById(@Param('id') id: number) {
-    return await this.productService.getProductById(id, false);
+    return await this.productService.getDrugById(id, false);
   }
 
   @Get('/category/:id')
@@ -22,9 +22,9 @@ export class PublicProductController {
     return await this.productService.getAllByCategory(id, false);
   }
 
-  @Get('/product-type/:id')
+  @Get('/drug-type/:id')
   async getAllByProductType(@Param('id') id: number) {
-    return await this.productService.getAllByProductType(id, false);
+    return await this.productService.getAllByDrugType(id, false);
   }
 
   @Get()

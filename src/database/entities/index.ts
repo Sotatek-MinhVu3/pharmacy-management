@@ -1,15 +1,15 @@
-import { Branch } from './branch.entity';
-import { Category } from './category.entity';
-import { ProductType } from './product-type.entity';
-import { Product } from './product.entity';
-import { Supplier } from './supplier.entity';
-import { User } from './user.entity';
+import { BranchEntity } from './branch.entity';
+import { CategoryEntity } from './category.entity';
+import { DrugTypeEntity } from './drug-type.entity';
+import { DrugEntity } from './product.entity';
+import { SupplierEntity } from './supplier.entity';
+import { UserEntity } from './user.entity';
 
 export const entities = [
-  Branch,
-  User,
-  Supplier,
-  ProductType,
-  Category,
-  Product,
+  BranchEntity,
+  UserEntity,
+  SupplierEntity,
+  DrugEntity,
+  CategoryEntity,
+  DrugTypeEntity,
 ];

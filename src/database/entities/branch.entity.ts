@@ -6,8 +6,8 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 
-@Entity()
-export class Branch {
+@Entity({ name: 'branches' })
+export class BranchEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

@@ -6,7 +6,7 @@ import { SharedModule } from './modules/shared/shared.module';
 import { BranchModule } from './modules/branch/branch.module';
 import { SupplierModule } from './modules/supplier/supplier.module';
 import { CategoryModule } from './modules/category/category.module';
-import { ProductModule } from './modules/product/product.module';
+import { DrugModule } from './modules/drug/drug.module';
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { ProductModule } from './modules/product/product.module';
     SupplierModule,
     CategoryModule,
     SupplierModule,
-    ProductModule,
+    DrugModule,
     SharedModule,
   ],
   controllers: [AppController],
