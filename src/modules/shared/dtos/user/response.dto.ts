@@ -1,7 +1,10 @@
 import { Expose } from 'class-transformer';
-import { EUserStatus } from '../../constants';
+import { ERole, EUserStatus } from '../../constants';
 
 export class GetProfileDto {
+  @Expose()
+  userId: number;
+
   @Expose()
   email: string;
 
@@ -15,8 +18,25 @@ export class GetProfileDto {
   phone: string;
 
   @Expose()
-  branchId: number;
+  branchId?: number;
 
   @Expose()
-  status: EUserStatus;
+  status?: EUserStatus;
+}
+
+export class GetUserFromRequestDto {
+  @Expose()
+  id: number;
+
+  @Expose()
+  email: string;
+
+  @Expose()
+  role: ERole;
+
+  @Expose()
+  branchId?: number;
+
+  @Expose()
+  status?: EUserStatus;
 }
