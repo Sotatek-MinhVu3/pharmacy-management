@@ -7,6 +7,15 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   password: string;
+}
+
+export class CreateCustomerDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
 
   @IsNotEmpty()
   firstName: string;
@@ -36,6 +45,13 @@ export class CreateStaffDto {
   phone: string;
 }
 
+export class UpdateStaffDto {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  branchId: number;
+}
+
 export class CreateBranchAdminDto {
   @IsNotEmpty()
   @IsEmail()
@@ -57,7 +73,7 @@ export class CreateBranchAdminDto {
   phone: string;
 }
 
-export class UpdateUserDto {
+export class UpdateProfileDto {
   firstName: string;
   lastName: string;
   phone: string;
@@ -68,6 +84,11 @@ export class LoginUserDto {
   @IsEmail()
   email: string;
 
+  @IsNotEmpty()
+  password: string;
+}
+
+export class ChangePasswordDto {
   @IsNotEmpty()
   password: string;
 }

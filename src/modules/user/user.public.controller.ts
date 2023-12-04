@@ -5,17 +5,24 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
-import { CreateUserDto, LoginUserDto } from '../shared/dtos/user/request.dto';
-import { UserService } from './user.service';
+import {
+  CreateCustomerDto,
+  LoginUserDto,
+} from '../shared/dtos/user/request.dto';
+import { UserService } from './services/user.service';
+import { CustomerService } from './services/customer.service';
 
 @Controller('user-public')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UserPublicController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private readonly customerService: CustomerService,
+  ) {}
 
   @Post('/register')
-  async register(@Body() reqBody: CreateUserDto) {
-    return await this.userService.register(reqBody);
+  async register(@Body() reqBody: CreateCustomerDto) {
+    return await this.customerService.createCustomer(reqBody);
   }
 
   @Post('/login')
