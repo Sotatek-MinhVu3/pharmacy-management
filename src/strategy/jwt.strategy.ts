@@ -4,9 +4,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ERole } from 'src/modules/shared/constants';
-import { AdminService } from 'src/modules/user/services/admin.service';
 import { BranchAdminService } from 'src/modules/user/services/branch-admin.service';
-import { CustomerService } from 'src/modules/user/services/customer.service';
 import { StaffService } from 'src/modules/user/services/staff.service';
 import { UserService } from 'src/modules/user/services/user.service';
 

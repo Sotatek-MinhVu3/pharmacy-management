@@ -12,6 +12,7 @@ export class AdminService {
   ) {}
 
   async getById(userId: number) {
+    console.log('Here admin id:', userId);
     const admin = await this.adminRepo.findOneBy({ userId });
     if (!admin) {
       throw new NotFoundException('Admin not found.');
