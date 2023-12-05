@@ -20,8 +20,6 @@ import {
   CreateDrugTypeDto,
   UpdateDrugTypeDto,
 } from '../shared/dtos/drug-type/request.dto';
-import * as categories from './../../database/seeders/categories.json';
-import * as drugTypes from './../../database/seeders/drug-types.json';
 
 @Controller('categories')
 export class CategoryController {

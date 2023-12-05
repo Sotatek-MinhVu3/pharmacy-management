@@ -19,24 +19,24 @@ import {
 } from '../shared/dtos/supplier/request.dto';
 
 @Controller('supplier')
-@UseGuards(CustomAuthGuard)
 @UseInterceptors(ClassSerializerInterceptor)
 export class SupplierController {
   constructor(private supplierService: SupplierService) {}
 
   @Post('/create')
+  @UseGuards(CustomAuthGuard)
   @UseGuards(new RoleGuard([ERole.ADMIN]))
   async createSupplier(@Body() reqBody: CreateSupplierDto) {
     return await this.supplierService.create(reqBody);
   }
 
   @Get()
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
   async getAll() {
     return await this.supplierService.getAll();
   }
 
   @Put('/:id')
+  @UseGuards(CustomAuthGuard)
   @UseGuards(new RoleGuard([ERole.ADMIN]))
   async updateSupplier(
     @Param('id') id: number,
