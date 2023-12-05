@@ -150,7 +150,6 @@ export class UserController {
     switch (role) {
       case ERole.ADMIN:
         const admin = await this.adminService.getById(id);
-        console.log('Admin:', admin);
         return plainToClass(GetProfileDto, admin, {
           excludeExtraneousValues: true,
         });
