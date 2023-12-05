@@ -30,6 +30,10 @@ export class CategoryService {
     return newCategory;
   }
 
+  async getAll() {
+    return await this.categoryRepo.find();
+  }
+
   async getCategoryBySlug(slug: string) {
     return await this.categoryRepo.findOneBy({ slug });
   }

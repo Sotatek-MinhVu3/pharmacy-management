@@ -24,22 +24,19 @@ import * as categories from './../../database/seeders/categories.json';
 import * as drugTypes from './../../database/seeders/drug-types.json';
 
 @Controller('categories')
-@UseGuards(CustomAuthGuard)
 export class CategoryController {
   constructor(
     private categoryService: CategoryService,
     private drugTypeService: DrugTypeService,
   ) {}
 
-  @Post('/seed')
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
-  async seedCategories() {
-    for (let category of categories.entries()) {
-      await this.categoryService.create(category[1]);
-    }
+  @Get()
+  async getAllCategories() {
+    return await this.categoryService.getAll();
   }
 
   @Post('/create')
+  @UseGuards(CustomAuthGuard)
   @UseGuards(new RoleGuard([ERole.ADMIN]))
   async createCategory(@Body() reqBody: CreateCategoryDto) {
     await this.categoryService.create(reqBody);
@@ -51,6 +48,7 @@ export class CategoryController {
   }
 
   @Put('/:id/')
+  @UseGuards(CustomAuthGuard)
   @UseGuards(new RoleGuard([ERole.ADMIN]))
   async updateCategory(
     @Param('id') id: number,
@@ -69,21 +67,15 @@ export class CategoryController {
     return await this.drugTypeService.getDrugTypeById(id);
   }
 
-  @Post('/drug-types/seed')
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
-  async seedDrugTypes() {
-    for (let drugType of drugTypes.entries()) {
-      await this.drugTypeService.create(drugType[1]);
-    }
-  }
-
   @Post('/drug-types/create')
+  @UseGuards(CustomAuthGuard)
   @UseGuards(new RoleGuard([ERole.ADMIN]))
   async createDrugType(@Body() reqBody: CreateDrugTypeDto) {
     return await this.drugTypeService.create(reqBody);
   }
 
   @Put('/:categoryId/drug-types/:typeId')
+  @UseGuards(CustomAuthGuard)
   @UseGuards(new RoleGuard([ERole.ADMIN]))
   async updateProductType(
     @Param('categoryId') categoryId: number,
