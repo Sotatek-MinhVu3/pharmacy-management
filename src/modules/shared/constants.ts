@@ -17,3 +17,8 @@ export enum EDrugUnit {
   PELLET = 'pellet',
   BLISTER = 'blister',
 }
+
+export enum ERackType {
+  BRANCH = 'branch',
+  TOTAL = 'total',
+}
