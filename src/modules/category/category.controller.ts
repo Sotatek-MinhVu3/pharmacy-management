@@ -34,8 +34,7 @@ export class CategoryController {
   }
 
   @Post('/create')
-  @UseGuards(CustomAuthGuard)
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async createCategory(@Body() reqBody: CreateCategoryDto) {
     await this.categoryService.create(reqBody);
   }
@@ -46,8 +45,7 @@ export class CategoryController {
   }
 
   @Put('/:id/')
-  @UseGuards(CustomAuthGuard)
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async updateCategory(
     @Param('id') id: number,
     @Body() reqBody: UpdateCategoryDto,
@@ -66,15 +64,13 @@ export class CategoryController {
   }
 
   @Post('/drug-types/create')
-  @UseGuards(CustomAuthGuard)
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async createDrugType(@Body() reqBody: CreateDrugTypeDto) {
     return await this.drugTypeService.create(reqBody);
   }
 
   @Put('/:categoryId/drug-types/:typeId')
-  @UseGuards(CustomAuthGuard)
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async updateProductType(
     @Param('categoryId') categoryId: number,
     @Param('typeId') typeId: number,
