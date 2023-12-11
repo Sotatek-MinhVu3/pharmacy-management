@@ -10,6 +10,8 @@ import { AdminService } from './services/admin.service';
 import { BranchAdminService } from './services/branch-admin.service';
 import { StaffService } from './services/staff.service';
 import { CustomerService } from './services/customer.service';
+import { BranchModule } from '../branch/branch.module';
+import { BranchService } from '../branch/branch.service';
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { CustomerService } from './services/customer.service';
       global: true,
       signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
     }),
+    BranchModule,
   ],
   providers: [
     UserService,
@@ -26,6 +29,7 @@ import { CustomerService } from './services/customer.service';
     StaffService,
     CustomerService,
     JwtStrategy,
+    BranchService,
   ],
   controllers: [UserController, UserPublicController],
 })

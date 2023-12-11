@@ -9,6 +9,7 @@ import {
 import { Repository } from 'typeorm';
 import { UserService } from './user.service';
 import { ERole } from 'src/modules/shared/constants';
+import { BranchService } from 'src/modules/branch/branch.service';
 
 @Injectable()
 export class StaffService {
@@ -16,6 +17,7 @@ export class StaffService {
     @InjectRepository(StaffEntity)
     private readonly staffRepo: Repository<StaffEntity>,
     private readonly userService: UserService,
+    private readonly branchService: BranchService,
   ) {}
 
   async createStaff(reqBody: CreateStaffDto, branchId: number) {
@@ -38,23 +40,48 @@ export class StaffService {
   }
 
   async getAll() {
-    return await this.staffRepo.find();
+    const [staffs, branches] = await Promise.all([
+      this.staffRepo.find(),
+      this.branchService.getAllBranches(),
+    ]);
+    const res = staffs.map((staff) => {
+      const branchName = branches.find(
+        (branch) => branch.id === staff.branchId,
+      ).name;
+      return { ...staff, branchName: branchName };
+    });
+    return res;
   }
 
   async getById(userId: number) {
-    const staff = await this.staffRepo.findOneBy({ userId });
+    const [staff, branches] = await Promise.all([
+      this.staffRepo.findOneBy({ userId }),
+      this.branchService.getAllBranches(),
+    ]);
     if (!staff) {
       throw new NotFoundException('Staff not found.');
     }
-    return staff;
+    const branchName = branches.find(
+      (branch) => branch.id === staff.branchId,
+    ).name;
+    return { ...staff, branchName: branchName };
   }
 
   async getAllByBranchId(branchId: number) {
-    const staffs = await this.staffRepo.findBy({ branchId });
+    const [staffs, branches] = await Promise.all([
+      this.staffRepo.findBy({ branchId }),
+      this.branchService.getAllBranches(),
+    ]);
     if (!staffs.length) {
       throw new NotFoundException('Staff by branch id not found.');
     }
-    return staffs;
+    const res = staffs.map((staff) => {
+      const branchName = branches.find(
+        (branch) => branch.id === staff.branchId,
+      ).name;
+      return { ...staff, branchName: branchName };
+    });
+    return res;
   }
 
   async updateProfile(userId: number, reqBody: UpdateProfileDto) {

@@ -12,6 +12,7 @@ import {
 import { Repository } from 'typeorm';
 import { UserService } from './user.service';
 import { ERole } from 'src/modules/shared/constants';
+import { BranchService } from 'src/modules/branch/branch.service';
 
 @Injectable()
 export class BranchAdminService {
@@ -19,10 +20,21 @@ export class BranchAdminService {
     @InjectRepository(BranchAdminEntity)
     private readonly branchAdminRepo: Repository<BranchAdminEntity>,
     private readonly userService: UserService,
+    private readonly branchService: BranchService,
   ) {}
 
   async getAll() {
-    return await this.branchAdminRepo.find();
+    const [branchAdmins, branches] = await Promise.all([
+      this.branchAdminRepo.find(),
+      this.branchService.getAllBranches(),
+    ]);
+    const res = branchAdmins.map((bra) => {
+      const branchName = branches.find(
+        (branch) => branch.id === bra.branchId,
+      ).name;
+      return { ...bra, branchName: branchName };
+    });
+    return res;
   }
 
   async createBranchAdmin(reqBody: CreateBranchAdminDto) {
@@ -45,11 +57,17 @@ export class BranchAdminService {
   }
 
   async getById(userId: number) {
-    const branchAdmin = await this.branchAdminRepo.findOneBy({ userId });
+    const [branchAdmin, branches] = await Promise.all([
+      this.branchAdminRepo.findOneBy({ userId }),
+      this.branchService.getAllBranches(),
+    ]);
     if (!branchAdmin) {
       throw new NotFoundException('Branch admin not found.');
     }
-    return branchAdmin;
+    const branchName = branches.find(
+      (branch) => branch.id === branchAdmin.branchId,
+    ).name;
+    return { ...branchAdmin, branchName: branchName };
   }
 
   async updateProfile(userId: number, reqBody: UpdateProfileDto) {
