@@ -34,6 +34,11 @@ export class SupplierController {
     return await this.supplierService.getAll();
   }
 
+  @Get('/:id')
+  async getSupplierById(@Param('id') id: number) {
+    return await this.supplierService.getSupplierById(id);
+  }
+
   @Put('/:id')
   @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async updateSupplier(
