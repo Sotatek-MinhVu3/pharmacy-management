@@ -24,8 +24,7 @@ export class SupplierController {
   constructor(private supplierService: SupplierService) {}
 
   @Post('/create')
-  @UseGuards(CustomAuthGuard)
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async createSupplier(@Body() reqBody: CreateSupplierDto) {
     return await this.supplierService.create(reqBody);
   }
@@ -36,8 +35,7 @@ export class SupplierController {
   }
 
   @Put('/:id')
-  @UseGuards(CustomAuthGuard)
-  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async updateSupplier(
     @Param('id') id: number,
     @Body() reqBody: UpdateSupplierDto,

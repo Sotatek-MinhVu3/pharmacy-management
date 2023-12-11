@@ -75,10 +75,7 @@ export class UserController {
 
   @Get('/staff')
   @UseGuards(new RoleGuard([ERole.BRANCH_ADMIN, ERole.ADMIN]))
-  async gettAllStaffs(
-    @Req() request: Request,
-    @Body() reqBody: CreateStaffDto,
-  ) {
+  async gettAllStaffs(@Req() request: Request) {
     const { role, branchId } = plainToClass(
       GetUserFromRequestDto,
       request.user,
