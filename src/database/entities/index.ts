@@ -5,6 +5,8 @@ import { CategoryEntity } from './category.entity';
 import { CustomerEntity } from './customer.entity';
 import { DrugTypeEntity } from './drug-type.entity';
 import { DrugEntity } from './drug.entity';
+import { RackDrugEntity } from './rack-drug.entity';
+import { RackEntity } from './rack.entity';
 import { StaffEntity } from './staff.entity';
 import { SupplierEntity } from './supplier.entity';
 import { UserEntity } from './user.entity';
@@ -20,4 +22,6 @@ export const entities = [
   BranchAdminEntity,
   StaffEntity,
   CustomerEntity,
+  RackEntity,
+  RackDrugEntity,
 ];

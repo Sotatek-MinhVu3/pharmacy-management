@@ -8,5 +8,6 @@ import { DrugTypeService } from '../category/drug-type/drug-type.service';
   imports: [SharedModule],
   providers: [DrugService, DrugTypeService],
   controllers: [DrugController],
+  exports: [DrugService],
 })
 export class DrugModule {}
