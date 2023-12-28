@@ -102,8 +102,8 @@ export class RackService {
         branchWarehouse.branchId,
       );
       res.push({
-        ...drugs,
-        ...branch,
+        drugs,
+        branch,
         capacityUsed,
         capacity: branchWarehouse.capacity,
       });
@@ -144,7 +144,13 @@ export class RackService {
     if (!(rack.type === ERackType.BRANCH && rack.branchId === branchId)) {
       throw new ForbiddenException('You cannot add to this rack.');
     }
-    return await this.addDrugsToRack(reqBody);
+    await this.addDrugsToRack(reqBody);
+    const branchWarehouse = await this.rackRepo.findOneBy({
+      type: ERackType.BRANCH_WAREHOUSE,
+      branchId,
+    });
+    await this.removeDrugsFromRack({ ...reqBody, rackId: branchWarehouse.id });
+    return 'Add drugs successful.';
   }
 
   async getBranchWarehouseByBranchId(branchId: number) {
