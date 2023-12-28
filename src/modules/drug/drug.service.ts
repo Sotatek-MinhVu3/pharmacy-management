@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { DrugEntity } from 'src/database/entities/drug.entity';
 import { CreateDrugDto, UpdateDrugDto } from '../shared/dtos/drug/request.dto';
 import { DrugTypeService } from '../category/drug-type/drug-type.service';
@@ -84,6 +84,10 @@ export class DrugService {
       throw new NotFoundException('Drug not found!');
     }
     return drug;
+  }
+
+  async getDrugsByIds(ids: number[]) {
+    return await this.drugRepo.find({ where: { id: In([...ids]) } });
   }
 
   async updateDrug(id: number, reqBody: UpdateDrugDto) {
