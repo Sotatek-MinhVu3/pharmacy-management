@@ -120,11 +120,19 @@ export class RackController {
   }
 
   @Get('/:rackId/capacity-used')
-  @UseGuards(
-    CustomAuthGuard,
-    new RoleGuard([ERole.ADMIN, ERole.BRANCH_ADMIN, ERole.STAFF]),
-  )
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async getCapacityUsed(@Param('rackId') rackId: number) {
     return await this.rackService.getCapacityUsed(rackId);
+  }
+
+  @Get('/my-branch/capacity-used')
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN, ERole.STAFF]))
+  async getMyCapacityUsed(@Req() req: any) {
+    const { branchId } = plainToClass(GetUserFromRequestDto, req.user, {
+      excludeExtraneousValues: true,
+    });
+    const branchWarehouse =
+      await this.rackService.getBranchWarehouseByBranchId(branchId);
+    return await this.rackService.getCapacityUsed(branchWarehouse.id);
   }
 }

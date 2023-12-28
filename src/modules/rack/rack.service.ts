@@ -63,7 +63,9 @@ export class RackService {
 
   async getTotalRack() {
     const totalRack = await this.rackRepo.findOneBy({ type: ERackType.TOTAL });
-    return await this.getAllDrugsOfRack(totalRack.id);
+    const drugs = await this.getAllDrugsOfRack(totalRack.id);
+    const capacityUsed = await this.getCapacityUsed(totalRack.id);
+    return { capacityUsed, drugs };
   }
 
   async getAllBranchRacks() {
@@ -74,7 +76,8 @@ export class RackService {
     if (!branchRacks.length) return [];
     for (const branchRack of branchRacks) {
       const drugs = await this.getAllDrugsOfRack(branchRack.id);
-      res.push({ ...drugs, branchId: branchRack.branchId });
+      const capacityUsed = await this.getCapacityUsed(branchRack.id);
+      res.push({ ...drugs, branchId: branchRack.branchId, capacityUsed });
     }
     return res;
   }
@@ -87,7 +90,8 @@ export class RackService {
     if (!branchWarehouses.length) return [];
     for (const branchWarehouse of branchWarehouses) {
       const drugs = await this.getAllDrugsOfRack(branchWarehouse.id);
-      res.push({ ...drugs, branchId: branchWarehouse.branchId });
+      const capacityUsed = await this.getCapacityUsed(branchWarehouse.id);
+      res.push({ ...drugs, branchId: branchWarehouse.branchId, capacityUsed });
     }
     return res;
   }
@@ -118,6 +122,13 @@ export class RackService {
       throw new ForbiddenException('You cannot add to this rack.');
     }
     return await this.addDrugsToRack(reqBody);
+  }
+
+  async getBranchWarehouseByBranchId(branchId: number) {
+    return await this.rackRepo.findOneBy({
+      type: ERackType.BRANCH_WAREHOUSE,
+      branchId,
+    });
   }
 
   async addDrugsToRack(reqBody: UpdateRackDrugRequestDto) {
