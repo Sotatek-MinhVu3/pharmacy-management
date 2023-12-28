@@ -65,7 +65,7 @@ export class RackService {
     const totalRack = await this.rackRepo.findOneBy({ type: ERackType.TOTAL });
     const drugs = await this.getAllDrugsOfRack(totalRack.id);
     const capacityUsed = await this.getCapacityUsed(totalRack.id);
-    return { capacityUsed, drugs };
+    return { capacityUsed, drugs, capacity: totalRack.capacity };
   }
 
   async getAllBranchRacks() {
@@ -77,7 +77,12 @@ export class RackService {
     for (const branchRack of branchRacks) {
       const drugs = await this.getAllDrugsOfRack(branchRack.id);
       const capacityUsed = await this.getCapacityUsed(branchRack.id);
-      res.push({ ...drugs, branchId: branchRack.branchId, capacityUsed });
+      res.push({
+        ...drugs,
+        branchId: branchRack.branchId,
+        capacityUsed,
+        capacity: branchRack.capacity,
+      });
     }
     return res;
   }
@@ -91,7 +96,12 @@ export class RackService {
     for (const branchWarehouse of branchWarehouses) {
       const drugs = await this.getAllDrugsOfRack(branchWarehouse.id);
       const capacityUsed = await this.getCapacityUsed(branchWarehouse.id);
-      res.push({ ...drugs, branchId: branchWarehouse.branchId, capacityUsed });
+      res.push({
+        ...drugs,
+        branchId: branchWarehouse.branchId,
+        capacityUsed,
+        capacity: branchWarehouse.capacity,
+      });
     }
     return res;
   }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   ClassSerializerInterceptor,
   Controller,
@@ -13,10 +14,11 @@ import {
 import { RackService } from './rack.service';
 import { CustomAuthGuard } from 'src/guards/custom-auth.guard';
 import { RoleGuard } from 'src/guards/role.guard';
-import { ERole } from '../shared/constants';
+import { ERackType, ERole } from '../shared/constants';
 import {
   CreateRackRequestDto,
   UpdateRackDrugRequestDto,
+  UpdateRackRequestDto,
 } from '../shared/dtos/rack/request.dto';
 import { plainToClass } from 'class-transformer';
 import { GetUserFromRequestDto } from '../shared/dtos/user/response.dto';
@@ -30,6 +32,24 @@ export class RackController {
   @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async createTotalRack(@Body() reqBody: CreateRackRequestDto) {
     return await this.rackService.createTotalRack(reqBody);
+  }
+
+  @Put('/total')
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
+  async updateTotalRack(@Body() reqBody: UpdateRackRequestDto) {
+    const totalRack = await this.rackService.getRackById(reqBody.rackId);
+    if (totalRack.type !== ERackType.TOTAL)
+      throw new BadRequestException('This rack is not total rack.');
+    return await this.rackService.updateRack(reqBody.rackId, reqBody.capacity);
+  }
+
+  @Put('/branch-warehouse')
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
+  async updateBranchWarehouse(@Body() reqBody: UpdateRackRequestDto) {
+    const totalRack = await this.rackService.getRackById(reqBody.rackId);
+    if (totalRack.type !== ERackType.BRANCH_WAREHOUSE)
+      throw new BadRequestException('This rack is not branch warehouse.');
+    return await this.rackService.updateRack(reqBody.rackId, reqBody.capacity);
   }
 
   @Post('/branch-warehouse/:branchId')

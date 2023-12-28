@@ -33,3 +33,13 @@ export class UpdateRackDrugRequestDto {
   @IsInt()
   quantity: number;
 }
+
+export class UpdateRackRequestDto {
+  @IsNotEmpty()
+  @IsInt()
+  rackId: number;
+
+  @IsNotEmpty()
+  @IsInt()
+  capacity: number;
+}
