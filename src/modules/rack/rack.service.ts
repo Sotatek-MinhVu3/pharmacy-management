@@ -106,6 +106,7 @@ export class RackService {
         branch,
         capacityUsed,
         capacity: branchWarehouse.capacity,
+        rackId: branchWarehouse.id,
       });
     }
     return res;
