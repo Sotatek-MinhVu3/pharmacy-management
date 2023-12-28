@@ -26,13 +26,22 @@ import { GetUserFromRequestDto } from '../shared/dtos/user/response.dto';
 export class RackController {
   constructor(private rackService: RackService) {}
 
-  @Post('/total/create')
+  @Post('/total')
   @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async createTotalRack(@Body() reqBody: CreateRackRequestDto) {
     return await this.rackService.createTotalRack(reqBody);
   }
 
-  @Post('/branch/create')
+  @Post('/branch-warehouse/:branchId')
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
+  async createBranchWarehouse(
+    @Param('branchId') branchId: number,
+    @Body() reqBody: CreateRackRequestDto,
+  ) {
+    return await this.rackService.createBranchWarehouse(reqBody, branchId);
+  }
+
+  @Post('/branch')
   @UseGuards(CustomAuthGuard, new RoleGuard([ERole.BRANCH_ADMIN]))
   async createBranchRack(
     @Req() req: any,
@@ -44,21 +53,10 @@ export class RackController {
     return await this.rackService.createBranchRack(reqBody, branchId);
   }
 
-  @Get()
-  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
-  async getAll() {
-    const [totalRacks, branchRacks] = await Promise.all([
-      this.rackService.getAllTotalRacks(),
-      this.rackService.getAllBranchRacks(),
-    ]);
-    return { total: totalRacks, branch: branchRacks };
-  }
-
   @Get('/total')
   @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async getTotalRacks() {
-    const totalRacks = await this.rackService.getAllTotalRacks();
-    return totalRacks;
+    return await this.rackService.getTotalRack();
   }
 
   @Get('/branch')

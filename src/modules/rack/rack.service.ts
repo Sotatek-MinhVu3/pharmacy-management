@@ -15,6 +15,7 @@ import {
 } from '../shared/dtos/rack/request.dto';
 import { ERackType } from '../shared/constants';
 import { DrugService } from '../drug/drug.service';
+import { DrugEntity } from 'src/database/entities/drug.entity';
 
 @Injectable()
 export class RackService {
@@ -28,61 +29,67 @@ export class RackService {
     private readonly drugService: DrugService,
   ) {}
 
-  async createTotalRack(reqBody: CreateRackRequestDto) {
-    const newRack = this.rackRepo.create({ ...reqBody, type: ERackType.TOTAL });
-    const existedVirtualRack = await this.rackRepo.findOneBy({
-      type: ERackType.VIRTUAL,
-      branchId: 0,
-    });
-    if (!existedVirtualRack) {
-      const newVirtualRack = this.rackRepo.create({
-        type: ERackType.VIRTUAL,
-        capacity: reqBody.capacity,
-      });
-      await this.rackRepo.save(newVirtualRack);
-    } else {
-      await this.updateVirtualRack(
-        existedVirtualRack.id,
-        existedVirtualRack.capacity + reqBody.capacity,
-      );
-    }
+  async createRack(
+    reqBody: CreateRackRequestDto,
+    type: ERackType,
+    branchId: number,
+  ) {
+    const newRack = this.rackRepo.create({ ...reqBody, type, branchId });
     return await this.rackRepo.save(newRack);
+  }
+
+  async createTotalRack(reqBody: CreateRackRequestDto) {
+    const existedTotalRack = await this.rackRepo.findOneBy({
+      type: ERackType.TOTAL,
+    });
+    if (existedTotalRack)
+      throw new BadRequestException('Total rack already existed.');
+    return await this.createRack(reqBody, ERackType.TOTAL, 0);
   }
 
   async createBranchRack(reqBody: CreateRackRequestDto, branchId: number) {
-    const newRack = this.rackRepo.create({
-      ...reqBody,
-      branchId,
-      type: ERackType.BRANCH,
-    });
-    const existedVirtualRack = await this.rackRepo.findOneBy({
-      type: ERackType.VIRTUAL,
-      branchId: branchId,
-    });
-    if (!existedVirtualRack) {
-      const newVirtualRack = this.rackRepo.create({
-        type: ERackType.VIRTUAL,
-        capacity: reqBody.capacity,
-        branchId,
-      });
-      await this.rackRepo.save(newVirtualRack);
-    } else {
-      await this.updateVirtualRack(
-        existedVirtualRack.id,
-        existedVirtualRack.capacity + reqBody.capacity,
-      );
-    }
-    return await this.rackRepo.save(newRack);
+    return await this.createRack(reqBody, ERackType.BRANCH, branchId);
   }
 
-  async getAllTotalRacks() {
-    const res = await this.rackRepo.find({ where: { type: ERackType.TOTAL } });
-    if (!res.length) return [];
+  async createBranchWarehouse(reqBody: CreateRackRequestDto, branchId: number) {
+    const existedBranchWarehouse = await this.rackRepo.findOneBy({
+      type: ERackType.BRANCH_WAREHOUSE,
+      branchId,
+    });
+    if (existedBranchWarehouse)
+      throw new BadRequestException('Branch warehouse already existed.');
+    return await this.createRack(reqBody, ERackType.BRANCH_WAREHOUSE, branchId);
+  }
+
+  async getTotalRack() {
+    const totalRack = await this.rackRepo.findOneBy({ type: ERackType.TOTAL });
+    return await this.getAllDrugsOfRack(totalRack.id);
   }
 
   async getAllBranchRacks() {
-    const res = await this.rackRepo.find({ where: { type: ERackType.BRANCH } });
-    if (!res.length) return [];
+    let res = [];
+    const branchRacks = await this.rackRepo.find({
+      where: { type: ERackType.BRANCH },
+    });
+    if (!branchRacks.length) return [];
+    for (const branchRack of branchRacks) {
+      const drugs = await this.getAllDrugsOfRack(branchRack.id);
+      res.push({ ...drugs, branchId: branchRack.branchId });
+    }
+    return res;
+  }
+
+  async getAllBranchWarehouses() {
+    let res = [];
+    const branchWarehouses = await this.rackRepo.find({
+      where: { type: ERackType.BRANCH_WAREHOUSE },
+    });
+    if (!branchWarehouses.length) return [];
+    for (const branchWarehouse of branchWarehouses) {
+      const drugs = await this.getAllDrugsOfRack(branchWarehouse.id);
+      res.push({ ...drugs, branchId: branchWarehouse.branchId });
+    }
+    return res;
   }
 
   async getRacksByBranchId(branchId: number) {
@@ -98,7 +105,7 @@ export class RackService {
     return rack;
   }
 
-  async updateVirtualRack(rackId: number, capacity: number) {
+  async updateRack(rackId: number, capacity: number) {
     return await this.rackRepo.save({ id: rackId, capacity });
   }
 
@@ -119,7 +126,11 @@ export class RackService {
       drugId: reqBody.drugId,
     });
     if (!rackDrug) return await this.createRackDrug(reqBody);
-    return await this.updateRackDrug(reqBody);
+    await this.validateCapacityLeft(reqBody);
+    return await this.updateRackDrug({
+      ...reqBody,
+      quantity: rackDrug.quantity + reqBody.quantity,
+    });
   }
 
   async removeDrugsFromBranchRack(
@@ -128,8 +139,9 @@ export class RackService {
   ) {
     const rack = await this.getRackById(reqBody.rackId);
     if (!(rack.type === ERackType.BRANCH && rack.branchId === branchId)) {
-      throw new ForbiddenException('You cannot move from this rack.');
+      throw new ForbiddenException('You cannot remove drugs from this rack.');
     }
+    const drug = await this.drugService.getDrugById(reqBody.drugId);
     return await this.removeDrugsFromRack(reqBody);
   }
 
@@ -143,21 +155,23 @@ export class RackService {
       throw new BadRequestException('Quantity left not enough.');
     return await this.updateRackDrug({
       ...reqBody,
-      quantity: reqBody.quantity * -1,
+      quantity: rackDrug.quantity - reqBody.quantity,
     });
   }
 
   async getCapacityLeft(rackId: number) {
-    const [rack, drugsOfRack] = await Promise.all([
-      this.getRackById(rackId),
-      this.getAllDrugsOfRack(rackId),
-    ]);
-    let capacityUsed = 0;
-    for (const rackDrug of drugsOfRack) {
-      const drug = await this.drugService.getDrugById(rackDrug.drugId);
-      capacityUsed += rackDrug.quantity * drug.size;
-    }
+    const rack = await this.getRackById(rackId);
+    const capacityUsed = await this.getCapacityUsed(rackId);
     return rack.capacity - capacityUsed;
+  }
+
+  async getCapacityUsed(rackId: number) {
+    const drugsOfRack = await this.getAllDrugsOfRack(rackId);
+    let capacityUsed = 0;
+    for (const drug of drugsOfRack) {
+      capacityUsed += drug.quantity * drug.size;
+    }
+    return capacityUsed;
   }
 
   async createRackDrug(reqBody: CreateRackDrugRequestDto) {
@@ -167,36 +181,28 @@ export class RackService {
       throw new BadRequestException('Out of capacity.');
     }
     const newRackDrug = this.rackDrugRepo.create(reqBody);
-    const virtualRack = await this.rackRepo.findOneBy({
-      type: ERackType.VIRTUAL,
-      branchId,
-    });
-    await this.updateVirtualRack(
-      reqBody.rackId,
-      virtualRack.capacity - drug.size * reqBody.quantity,
-    );
     return await this.rackDrugRepo.save(newRackDrug);
   }
 
   async updateRackDrug(reqBody: UpdateRackDrugRequestDto) {
-    const { branchId } = await this.getRackById(reqBody.rackId);
+    return await this.rackDrugRepo.save(reqBody);
+  }
+
+  private async validateCapacityLeft(reqBody: UpdateRackDrugRequestDto) {
     const capacityLeft = await this.getCapacityLeft(reqBody.rackId);
     const drug = await this.drugService.getDrugById(reqBody.drugId);
     if (capacityLeft - reqBody.quantity * drug.size < 0) {
       throw new BadRequestException('Out of capacity.');
     }
-    const virtualRack = await this.rackRepo.findOneBy({
-      type: ERackType.VIRTUAL,
-      branchId,
-    });
-    await this.updateVirtualRack(
-      reqBody.rackId,
-      virtualRack.capacity - drug.size * reqBody.quantity,
-    );
-    return await this.rackDrugRepo.save(reqBody);
   }
 
   async getAllDrugsOfRack(rackId: number) {
-    return await this.rackDrugRepo.find({ where: { rackId } });
+    const rackDrugs = await this.rackDrugRepo.find({ where: { rackId } });
+    let drugs: [DrugEntity & { quantity: number }];
+    for (const rackDrug of rackDrugs) {
+      const drug = await this.drugService.getDrugById(rackDrug.drugId);
+      drugs.push({ ...drug, quantity: rackDrug.quantity });
+    }
+    return drugs;
   }
 }

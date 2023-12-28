@@ -21,5 +21,5 @@ export enum EDrugUnit {
 export enum ERackType {
   TOTAL = 'total',
   BRANCH = 'branch',
-  VIRTUAL = 'virtual',
+  BRANCH_WAREHOUSE = 'branch_warehouse',
 }
