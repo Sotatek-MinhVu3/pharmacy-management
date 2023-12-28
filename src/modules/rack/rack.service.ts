@@ -209,7 +209,7 @@ export class RackService {
 
   async getAllDrugsOfRack(rackId: number) {
     const rackDrugs = await this.rackDrugRepo.find({ where: { rackId } });
-    let drugs: [DrugEntity & { quantity: number }];
+    let drugs: [DrugEntity & { quantity: number }] = [] as any;
     for (const rackDrug of rackDrugs) {
       const drug = await this.drugService.getDrugById(rackDrug.drugId);
       drugs.push({ ...drug, quantity: rackDrug.quantity });
