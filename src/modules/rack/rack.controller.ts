@@ -85,15 +85,27 @@ export class RackController {
 
   @Put('/add-drugs')
   @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
-  async addDrugsToRack(reqBody: UpdateRackDrugRequestDto) {
+  async addDrugsToRack(@Body() reqBody: UpdateRackDrugRequestDto) {
     await this.rackService.addDrugsToRack(reqBody);
   }
 
-  @Put('/branch/add-drugs')
+  @Post('/my-branch/create')
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.BRANCH_ADMIN]))
+  async createMyBranchRack(
+    @Req() req: any,
+    @Body() reqBody: CreateRackRequestDto,
+  ) {
+    const { branchId } = plainToClass(GetUserFromRequestDto, req.user, {
+      excludeExtraneousValues: true,
+    });
+    await this.rackService.createBranchRack(reqBody, branchId);
+  }
+
+  @Put('/my-branch/add-drugs')
   @UseGuards(CustomAuthGuard, new RoleGuard([ERole.BRANCH_ADMIN]))
   async addDrugsToBranchRack(
     @Req() req: any,
-    reqBody: UpdateRackDrugRequestDto,
+    @Body() reqBody: UpdateRackDrugRequestDto,
   ) {
     const { branchId } = plainToClass(GetUserFromRequestDto, req.user, {
       excludeExtraneousValues: true,
@@ -103,7 +115,7 @@ export class RackController {
 
   @Put('/remove-drugs')
   @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
-  async removeDrugsFromRack(reqBody: UpdateRackDrugRequestDto) {
+  async removeDrugsFromRack(@Body() reqBody: UpdateRackDrugRequestDto) {
     await this.rackService.removeDrugsFromRack(reqBody);
   }
 
@@ -111,7 +123,7 @@ export class RackController {
   @UseGuards(CustomAuthGuard, new RoleGuard([ERole.BRANCH_ADMIN]))
   async removeDrugsFromBranchRack(
     @Req() req: any,
-    reqBody: UpdateRackDrugRequestDto,
+    @Body() reqBody: UpdateRackDrugRequestDto,
   ) {
     const { branchId } = plainToClass(GetUserFromRequestDto, req.user, {
       excludeExtraneousValues: true,
