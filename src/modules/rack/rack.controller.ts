@@ -79,11 +79,10 @@ export class RackController {
     return await this.rackService.getTotalRack();
   }
 
-  @Get('/branch')
+  @Get('/branch-warehouse')
   @UseGuards(CustomAuthGuard, new RoleGuard([ERole.ADMIN]))
   async getBranchRacks() {
-    const branchRacks = await this.rackService.getAllBranchRacks();
-    return branchRacks;
+    return await this.rackService.getAllBranchWarehouses();
   }
 
   @Get('/branch/:branchId')
@@ -94,13 +93,22 @@ export class RackController {
   }
 
   @Get('/my-branch')
-  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.BRANCH_ADMIN]))
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.BRANCH_ADMIN, ERole.STAFF]))
   async getMyBranchRacks(@Req() req: any) {
     const { branchId } = plainToClass(GetUserFromRequestDto, req.user, {
       excludeExtraneousValues: true,
     });
     const branchRacks = await this.rackService.getRacksByBranchId(branchId);
     return branchRacks;
+  }
+
+  @Get('/my-branch/branch-warehouse')
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.BRANCH_ADMIN, ERole.STAFF]))
+  async getMyBranchWarehouse(@Req() req: any) {
+    const { branchId } = plainToClass(GetUserFromRequestDto, req.user, {
+      excludeExtraneousValues: true,
+    });
+    return await this.rackService.getBranchWarehouseByBranchId(branchId);
   }
 
   @Put('/add-drugs')

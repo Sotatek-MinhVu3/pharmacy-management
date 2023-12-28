@@ -7,5 +7,6 @@ import { BranchService } from './branch.service';
   imports: [SharedModule],
   providers: [BranchService],
   controllers: [BranchController],
+  exports: [BranchService],
 })
 export class BranchModule {}

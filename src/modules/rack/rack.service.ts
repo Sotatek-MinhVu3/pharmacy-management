@@ -16,6 +16,7 @@ import {
 import { ERackType } from '../shared/constants';
 import { DrugService } from '../drug/drug.service';
 import { DrugEntity } from 'src/database/entities/drug.entity';
+import { BranchService } from '../branch/branch.service';
 
 @Injectable()
 export class RackService {
@@ -27,6 +28,7 @@ export class RackService {
     private readonly rackDrugRepo: Repository<RackDrugEntity>,
 
     private readonly drugService: DrugService,
+    private readonly branchService: BranchService,
   ) {}
 
   async createRack(
@@ -96,9 +98,12 @@ export class RackService {
     for (const branchWarehouse of branchWarehouses) {
       const drugs = await this.getAllDrugsOfRack(branchWarehouse.id);
       const capacityUsed = await this.getCapacityUsed(branchWarehouse.id);
+      const branch = await this.branchService.getBranchById(
+        branchWarehouse.branchId,
+      );
       res.push({
         ...drugs,
-        branchId: branchWarehouse.branchId,
+        ...branch,
         capacityUsed,
         capacity: branchWarehouse.capacity,
       });
@@ -107,16 +112,24 @@ export class RackService {
   }
 
   async getRacksByBranchId(branchId: number) {
-    const res = await this.rackRepo.find({
+    const racks = await this.rackRepo.find({
       where: { type: ERackType.BRANCH, branchId },
     });
-    if (!res.length) return [];
+    if (!racks.length) return [];
+    let res = [];
+    for (const rack of racks) {
+      const drugs = await this.getAllDrugsOfRack(rack.id);
+      const capacityUsed = await this.getCapacityUsed(rack.id);
+      res.push({ drugs, capacityUsed, capacity: rack.capacity });
+    }
   }
 
   async getRackById(id: number) {
     const rack = await this.rackRepo.findOneBy({ id });
     if (!rack) throw new NotFoundException('Rack not found.');
-    return rack;
+    const drugs = await this.getAllDrugsOfRack(rack.id);
+    const capacityUsed = await this.getCapacityUsed(rack.id);
+    return { ...rack, drugs, capacityUsed };
   }
 
   async updateRack(rackId: number, capacity: number) {
@@ -135,10 +148,15 @@ export class RackService {
   }
 
   async getBranchWarehouseByBranchId(branchId: number) {
-    return await this.rackRepo.findOneBy({
+    const branchWarehouse = await this.rackRepo.findOneBy({
       type: ERackType.BRANCH_WAREHOUSE,
       branchId,
     });
+    if (!branchWarehouse)
+      throw new NotFoundException('Branch warehouse not found.');
+    const drugs = await this.getAllDrugsOfRack(branchWarehouse.id);
+    const capacityUsed = await this.getCapacityUsed(branchWarehouse.id);
+    return { ...branchWarehouse, capacityUsed, drugs };
   }
 
   async addDrugsToRack(reqBody: UpdateRackDrugRequestDto) {
