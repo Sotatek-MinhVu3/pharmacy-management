@@ -118,4 +118,13 @@ export class RackController {
     });
     await this.rackService.removeDrugsFromBranchRack(reqBody, branchId);
   }
+
+  @Get('/:rackId/capacity-used')
+  @UseGuards(
+    CustomAuthGuard,
+    new RoleGuard([ERole.ADMIN, ERole.BRANCH_ADMIN, ERole.STAFF]),
+  )
+  async getCapacityUsed(@Param('rackId') rackId: number) {
+    return await this.rackService.getCapacityUsed(rackId);
+  }
 }
