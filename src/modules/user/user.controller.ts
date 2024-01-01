@@ -2,6 +2,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -96,6 +97,12 @@ export class UserController {
   @Get('/staff/:id')
   @UseGuards(new RoleGuard([ERole.ADMIN, ERole.BRANCH_ADMIN]))
   async getStaffById(@Param('id') id: number) {
+    return await this.staffService.getById(id);
+  }
+
+  @Delete('/staff/:id')
+  @UseGuards(new RoleGuard([ERole.BRANCH_ADMIN]))
+  async deleteStaffById(@Param('id') id: number) {
     return await this.staffService.getById(id);
   }
 

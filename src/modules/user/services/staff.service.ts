@@ -92,4 +92,9 @@ export class StaffService {
     const newStaff = { ...staff, ...reqBody };
     return await this.staffRepo.save(newStaff);
   }
+
+  async deleteStaff(userId: number) {
+    await this.staffRepo.softDelete(userId);
+    return { message: 'Deleted staff.' };
+  }
 }

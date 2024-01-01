@@ -75,7 +75,8 @@ export class DrugService {
     if (!drug) {
       throw new NotFoundException('Drug not found!');
     }
-    return drug;
+    const drugType = await this.drugTypeService.getDrugTypeById(drug.typeId);
+    return { ...drug, categoryId: drugType.categoryId };
   }
 
   async getDrugByBarcode(barcode: number) {

@@ -119,9 +119,22 @@ export class RackService {
     if (!racks.length) return [];
     let res = [];
     for (const rack of racks) {
+      let drugsWithQuantity = [];
       const drugs = await this.getAllDrugsOfRack(rack.id);
+      for (const drug of drugs) {
+        const rackDrug = await this.rackDrugRepo.findOneBy({
+          rackId: rack.id,
+          drugId: drug.id,
+        });
+        drugsWithQuantity.push({ ...drug, quantity: rackDrug.quantity });
+      }
       const capacityUsed = await this.getCapacityUsed(rack.id);
-      res.push({ drugs, capacityUsed, capacity: rack.capacity });
+      res.push({
+        rackId: rack.id,
+        drugs: drugsWithQuantity,
+        capacityUsed,
+        capacity: rack.capacity,
+      });
     }
   }
 
@@ -145,11 +158,21 @@ export class RackService {
     if (!(rack.type === ERackType.BRANCH && rack.branchId === branchId)) {
       throw new ForbiddenException('You cannot add to this rack.');
     }
-    await this.addDrugsToRack(reqBody);
     const branchWarehouse = await this.rackRepo.findOneBy({
       type: ERackType.BRANCH_WAREHOUSE,
       branchId,
     });
+    const drugsInBranchWarehouse = await this.rackDrugRepo.findOneBy({
+      rackId: branchWarehouse.id,
+      drugId: reqBody.drugId,
+    });
+    if (
+      !drugsInBranchWarehouse ||
+      drugsInBranchWarehouse.quantity < reqBody.quantity
+    ) {
+      throw new BadRequestException('Drugs left not enough or not found.');
+    }
+    await this.addDrugsToRack(reqBody);
     await this.removeDrugsFromRack({ ...reqBody, rackId: branchWarehouse.id });
     return 'Add drugs successful.';
   }
@@ -185,6 +208,20 @@ export class RackService {
   ) {
     const rack = await this.getRackById(reqBody.rackId);
     if (!(rack.type === ERackType.BRANCH && rack.branchId === branchId)) {
+      throw new ForbiddenException('You cannot remove drugs from this rack.');
+    }
+    const drug = await this.drugService.getDrugById(reqBody.drugId);
+    return await this.removeDrugsFromRack(reqBody);
+  }
+
+  async removeDrugsFromBranchWarehouse(
+    reqBody: UpdateRackDrugRequestDto,
+    branchId: number,
+  ) {
+    const rack = await this.getRackById(reqBody.rackId);
+    if (
+      !(rack.type === ERackType.BRANCH_WAREHOUSE && rack.branchId === branchId)
+    ) {
       throw new ForbiddenException('You cannot remove drugs from this rack.');
     }
     const drug = await this.drugService.getDrugById(reqBody.drugId);

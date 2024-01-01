@@ -147,7 +147,7 @@ export class RackController {
     return await this.rackService.removeDrugsFromRack(reqBody);
   }
 
-  @Put('/my-branch/remove-drugs')
+  @Put('/my-branch/branch-rack/remove-drugs')
   @UseGuards(CustomAuthGuard, new RoleGuard([ERole.BRANCH_ADMIN]))
   async removeDrugsFromBranchRack(
     @Req() req: any,
@@ -157,6 +157,21 @@ export class RackController {
       excludeExtraneousValues: true,
     });
     return await this.rackService.removeDrugsFromBranchRack(reqBody, branchId);
+  }
+
+  @Put('/my-branch/branch-warehouse/remove-drugs')
+  @UseGuards(CustomAuthGuard, new RoleGuard([ERole.BRANCH_ADMIN]))
+  async removeDrugsFromBranchWarehouse(
+    @Req() req: any,
+    @Body() reqBody: UpdateRackDrugRequestDto,
+  ) {
+    const { branchId } = plainToClass(GetUserFromRequestDto, req.user, {
+      excludeExtraneousValues: true,
+    });
+    return await this.rackService.removeDrugsFromBranchWarehouse(
+      reqBody,
+      branchId,
+    );
   }
 
   @Get('/:rackId/capacity-used')
