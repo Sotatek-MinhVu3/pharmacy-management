@@ -103,7 +103,7 @@ export class UserController {
   @Delete('/staff/:id')
   @UseGuards(new RoleGuard([ERole.BRANCH_ADMIN]))
   async deleteStaffById(@Param('id') id: number) {
-    return await this.staffService.getById(id);
+    return await this.staffService.deleteStaff(id);
   }
 
   //customer

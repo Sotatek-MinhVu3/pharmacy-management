@@ -136,6 +136,7 @@ export class RackService {
         capacity: rack.capacity,
       });
     }
+    return res;
   }
 
   async getRackById(id: number) {
