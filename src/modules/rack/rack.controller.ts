@@ -138,7 +138,7 @@ export class RackController {
     const { branchId } = plainToClass(GetUserFromRequestDto, req.user, {
       excludeExtraneousValues: true,
     });
-    await this.rackService.addDrugsToBranchRack(reqBody, branchId);
+    return await this.rackService.addDrugsToBranchRack(reqBody, branchId);
   }
 
   @Put('/remove-drugs')
