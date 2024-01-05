@@ -46,10 +46,8 @@ export class OrderService {
     const updatedOrder = await this.orderRepo.save({ ...order, ...reqBody });
     if (reqBody.status === EOrderStatus.DONE) {
       if (order.splitFor) {
-        const splittedOrders = await this.getAllSplittedOrdersOfId(
-          order.splitFor,
-        );
-        if (splittedOrders.every((sp) => sp.status === EOrderStatus.DONE)) {
+        const subOrders = await this.getAllSubOrdersOfId(order.splitFor);
+        if (subOrders.every((sp) => sp.status === EOrderStatus.DONE)) {
           await this.orderRepo.update(
             { id: order.splitFor },
             { status: EOrderStatus.DONE },
@@ -60,7 +58,31 @@ export class OrderService {
     return updatedOrder;
   }
 
+  async getAllCreatedOrders(branchId: number) {
+    const splittedOrders = await this.orderRepo.find({
+      where: { branchId, status: EOrderStatus.CREATED },
+    });
+    let res = [];
+    for (const splittedOrder of splittedOrders) {
+      const orderWithDrug = await this.getOrderById(splittedOrder.id);
+      res.push(orderWithDrug);
+    }
+    return res;
+  }
+
   async getAllSplittedOrders(branchId: number) {
+    const splittedOrders = await this.orderRepo.find({
+      where: { branchId, isSplitted: true },
+    });
+    let res = [];
+    for (const splittedOrder of splittedOrders) {
+      const orderWithDrug = await this.getOrderById(splittedOrder.id);
+      res.push(orderWithDrug);
+    }
+    return res;
+  }
+
+  async getAllSubOrders(branchId: number) {
     const splittedOrders = await this.orderRepo.find({
       where: { branchId, splitFor: MoreThan(0) },
     });
@@ -130,13 +152,13 @@ export class OrderService {
     return res;
   }
 
-  async getAllSplittedOrdersOfId(id: number) {
-    const splittedOrders = await this.orderRepo.find({
+  async getAllSubOrdersOfId(id: number) {
+    const subOrders = await this.orderRepo.find({
       where: { splitFor: id },
     });
     let res = [];
-    for (const splittedOrder of splittedOrders) {
-      const orderWithDrug = await this.getOrderById(splittedOrder.id);
+    for (const subOrder of subOrders) {
+      const orderWithDrug = await this.getOrderById(subOrder.id);
       res.push(orderWithDrug);
     }
     return res;

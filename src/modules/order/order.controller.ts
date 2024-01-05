@@ -43,6 +43,12 @@ export class OrderController {
     return await this.orderService.getAllSplittedOrders(req.user.branchId);
   }
 
+  @Get('/created-orders')
+  @UseGuards(new RoleGuard([ERole.STAFF]))
+  async getCreatedOrders(@Req() req: any) {
+    return await this.orderService.getAllCreatedOrders(req.user.branchId);
+  }
+
   @Get('/approved-orders')
   @UseGuards(new RoleGuard([ERole.STAFF]))
   async getApprovedOrders(@Req() req: any) {
@@ -73,10 +79,10 @@ export class OrderController {
     return await this.orderService.getOrderById(id);
   }
 
-  @Get('/:id/splitted-orders')
+  @Get('/:id/sub-orders')
   @UseGuards(new RoleGuard([ERole.STAFF]))
-  async getSplittedOrdersOfId(@Param('id') id: number) {
-    return await this.orderService.getAllSplittedOrdersOfId(id);
+  async getSubOrdersOfId(@Param('id') id: number) {
+    return await this.orderService.getAllSubOrdersOfId(id);
   }
 
   @Put('/:id')
