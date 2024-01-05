@@ -23,3 +23,11 @@ export enum ERackType {
   BRANCH = 'branch',
   BRANCH_WAREHOUSE = 'branch_warehouse',
 }
+
+export enum EOrderStatus {
+  CREATED = 'created',
+  APPROVED = 'approved',
+  DELIVERED = 'delivered',
+  DONE = 'done',
+  REJECTED = 'rejected',
+}

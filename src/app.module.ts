@@ -8,6 +8,7 @@ import { SupplierModule } from './modules/supplier/supplier.module';
 import { CategoryModule } from './modules/category/category.module';
 import { DrugModule } from './modules/drug/drug.module';
 import { RackModule } from './modules/rack/rack.module';
+import { OrderModule } from './modules/order/order.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { RackModule } from './modules/rack/rack.module';
     DrugModule,
     SharedModule,
     RackModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
