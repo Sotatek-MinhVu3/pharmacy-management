@@ -16,6 +16,7 @@ import {
   CreateBranchAdminDto,
   CreateStaffDto,
   CreateUserDto,
+  TransferUserRequestDto,
   UpdateProfileDto,
 } from '../shared/dtos/user/request.dto';
 import { CustomAuthGuard } from 'src/guards/custom-auth.guard';
@@ -27,7 +28,6 @@ import {
 } from '../shared/dtos/user/response.dto';
 import { RoleGuard } from 'src/guards/role.guard';
 import { ERole } from '../shared/constants';
-import { UserEntity } from '../../database/entities/user.entity';
 import { BranchAdminService } from './services/branch-admin.service';
 import { CustomerService } from './services/customer.service';
 import { StaffService } from './services/staff.service';
@@ -62,6 +62,15 @@ export class UserController {
   @UseGuards(new RoleGuard([ERole.ADMIN]))
   async getBranchAdminById(@Param('id') id: number) {
     return await this.branchAdminService.getById(id);
+  }
+
+  @Put('/branch-admin/:id/transfer')
+  @UseGuards(new RoleGuard([ERole.ADMIN]))
+  async transferBranchAdmin(
+    @Param('id') id: number,
+    @Body() reqBody: TransferUserRequestDto,
+  ) {
+    return await this.userService.transferUser(id, reqBody);
   }
 
   //staff

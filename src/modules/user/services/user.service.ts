@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import {
   CreateUserDto,
   LoginUserDto,
+  TransferUserRequestDto,
 } from '../../shared/dtos/user/request.dto';
 import { ERole, EUserStatus } from '../../shared/constants';
 import { JwtService } from '@nestjs/jwt';
@@ -74,6 +75,21 @@ export class UserService {
     const access_token = await this.generateAccessToken(existedUser);
     return {
       msg: 'Login successfully',
+      access_token,
+    };
+  }
+
+  async transferUser(id: number, reqBody: TransferUserRequestDto) {
+    const existedUser = await this.getById(id);
+    const newPassword = await this.generateHashPassword(reqBody.password);
+    const newUser = await this.userRepo.save({
+      ...existedUser,
+      email: reqBody.email,
+      password: newPassword,
+    });
+    const access_token = await this.generateAccessToken(newUser);
+    return {
+      msg: 'User has been transferred successfully',
       access_token,
     };
   }

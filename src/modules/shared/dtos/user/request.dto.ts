@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsPhoneNumber } from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -71,6 +71,15 @@ export class CreateBranchAdminDto {
 
   @IsNotEmpty()
   phone: string;
+}
+
+export class TransferUserRequestDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
 }
 
 export class UpdateProfileDto {
