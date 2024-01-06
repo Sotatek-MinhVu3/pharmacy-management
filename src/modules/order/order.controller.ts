@@ -52,7 +52,7 @@ export class OrderController {
   @Get('/approved-orders')
   @UseGuards(new RoleGuard([ERole.STAFF]))
   async getApprovedOrders(@Req() req: any) {
-    return await this.orderService.getAllSplittedOrders(req.user.branchId);
+    return await this.orderService.getAllApprovedOrders(req.user.branchId);
   }
 
   @Get('/delivered-orders')
