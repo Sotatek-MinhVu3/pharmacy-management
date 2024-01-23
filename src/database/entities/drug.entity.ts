@@ -16,6 +16,9 @@ export class DrugEntity {
   @Column()
   name: string;
 
+  @Column()
+  img: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

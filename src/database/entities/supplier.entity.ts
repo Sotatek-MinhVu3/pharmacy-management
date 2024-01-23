@@ -18,6 +18,9 @@ export class SupplierEntity {
   name: string;
 
   @Column()
+  img: string;
+
+  @Column()
   phone: string;
 
   @DeleteDateColumn({ name: 'deleted_at' })
