@@ -5,10 +5,11 @@ import { BranchModule } from '../branch/branch.module';
 import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
 import { RackModule } from '../rack/rack.module';
+import { InsightController } from './insight.controller';
 
 @Module({
   imports: [SharedModule, DrugModule, BranchModule, RackModule],
   providers: [OrderService],
-  controllers: [OrderController],
+  controllers: [OrderController, InsightController],
 })
 export class OrderModule {}
