@@ -13,6 +13,7 @@ import {
 import { OrderService } from './order.service';
 import {
   CreateOrderRequestDto,
+  ServeOrderRequestDto,
   UpdateOrderStatusRequestDto,
 } from '../shared/dtos/order/request.dto';
 import { CustomAuthGuard } from 'src/guards/custom-auth.guard';
@@ -101,5 +102,14 @@ export class OrderController {
     @Body() reqBody: CreateOrderRequestDto[],
   ) {
     return await this.orderService.splitOrder(id, reqBody);
+  }
+
+  @Post('/:id/serve')
+  @UseGuards(new RoleGuard([ERole.STAFF]))
+  async serveOrder(
+    @Param('id') id: number,
+    @Body() reqBody: ServeOrderRequestDto[],
+  ) {
+    return await this.orderService.serveOrder(id, reqBody);
   }
 }

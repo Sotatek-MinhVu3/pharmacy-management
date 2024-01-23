@@ -70,7 +70,7 @@ export class UserController {
     @Param('id') id: number,
     @Body() reqBody: TransferUserRequestDto,
   ) {
-    return await this.userService.transferUser(id, reqBody);
+    return await this.branchAdminService.transferBranchAdmin(id, reqBody);
   }
 
   //staff

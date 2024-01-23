@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BranchAdminEntity } from 'src/database/entities/branch-admin.entity';
 import {
   CreateBranchAdminDto,
+  TransferUserRequestDto,
   UpdateProfileDto,
 } from 'src/modules/shared/dtos/user/request.dto';
 import { Repository } from 'typeorm';
@@ -77,5 +78,10 @@ export class BranchAdminService {
     }
     const newbranchAdmin = { ...branchAdmin, ...reqBody };
     return await this.branchAdminRepo.save(newbranchAdmin);
+  }
+
+  async transferBranchAdmin(userId: number, reqBody: TransferUserRequestDto) {
+    await this.updateProfile(userId, reqBody);
+    return await this.userService.transferUser(userId, reqBody);
   }
 }

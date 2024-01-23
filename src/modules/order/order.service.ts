@@ -6,10 +6,12 @@ import { MoreThan, Repository } from 'typeorm';
 import {
   CreateOrderRequestDto,
   DrugInOrder,
+  ServeOrderRequestDto,
   UpdateOrderStatusRequestDto,
 } from '../shared/dtos/order/request.dto';
 import { DrugService } from '../drug/drug.service';
 import { EOrderStatus } from '../shared/constants';
+import { RackService } from '../rack/rack.service';
 
 @Injectable()
 export class OrderService {
@@ -20,6 +22,7 @@ export class OrderService {
     @InjectRepository(OrderDrugEntity)
     private readonly orderDrugRepo: Repository<OrderDrugEntity>,
     private readonly drugService: DrugService,
+    private readonly rackService: RackService,
   ) {}
 
   async create(reqBody: CreateOrderRequestDto) {
@@ -184,6 +187,7 @@ export class OrderService {
   async splitOrder(id: number, reqBody: CreateOrderRequestDto[]) {
     const order = await this.getOrderById(id);
     this.validateSplitOrder(order.drugsWithQuantity, reqBody);
+    await this.validateSubOrders(reqBody);
     await this.orderRepo.update(id, { isSplitted: true });
     let splittedOrders = [];
     for (const createOrderRequest of reqBody) {
@@ -194,6 +198,18 @@ export class OrderService {
       splittedOrders.push(splittedOrder);
     }
     return { parentOrderId: Number(id), splittedOrders };
+  }
+
+  async serveOrder(id: number, reqBody: ServeOrderRequestDto[]) {
+    //Validate quantity left
+    for (const serveOrderReq of reqBody) {
+      await this.rackService.validateQuantityLeft(serveOrderReq);
+    }
+    //Update
+    for (const serveOrderReq of reqBody) {
+      await this.rackService.removeDrugsFromRack(serveOrderReq);
+    }
+    return await this.updateOrderStatus(id, { status: EOrderStatus.DELIVERED });
   }
 
   private validateSplitOrder(
@@ -215,6 +231,34 @@ export class OrderService {
         throw new BadRequestException(
           'Drugs in splitted order does not match drugs in parent order.',
         );
+      }
+    }
+  }
+
+  private async validateSubOrders(reqBody: CreateOrderRequestDto[]) {
+    for (const subOrder of reqBody) {
+      const branchRacks = await this.rackService.getRacksByBranchId(
+        subOrder.branchId,
+      );
+      for (const drugOfOrder of subOrder.drugs) {
+        let validDrugs = [];
+        branchRacks.forEach((rack) =>
+          validDrugs.push(
+            rack.drugs.filter((drug) => drug.drugId === drugOfOrder.drugId),
+          ),
+        );
+        if (!validDrugs.length) {
+          throw new BadRequestException(
+            `Branch with id ${subOrder.branchId} does not have drug with id ${drugOfOrder.drugId} now.`,
+          );
+        }
+        let quantityOfBranch = 0;
+        validDrugs.forEach((drug) => (quantityOfBranch += drug.quantity));
+        if (quantityOfBranch < drugOfOrder.quantity) {
+          throw new BadRequestException(
+            `Branch with id ${subOrder.branchId} does not have enough drugs to provide.`,
+          );
+        }
       }
     }
   }

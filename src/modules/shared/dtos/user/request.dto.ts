@@ -80,6 +80,15 @@ export class TransferUserRequestDto {
 
   @IsNotEmpty()
   password: string;
+
+  @IsNotEmpty()
+  firstName: string;
+
+  @IsNotEmpty()
+  lastName: string;
+
+  @IsNotEmpty()
+  phone: string;
 }
 
 export class UpdateProfileDto {

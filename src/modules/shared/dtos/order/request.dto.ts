@@ -46,3 +46,17 @@ export class UpdateOrderStatusRequestDto {
   @IsEnum(EOrderStatus)
   status: EOrderStatus;
 }
+
+export class ServeOrderRequestDto {
+  @IsNotEmpty()
+  @IsInt()
+  rackId: number;
+
+  @IsNotEmpty()
+  @IsInt()
+  drugId: number;
+
+  @IsNotEmpty()
+  @IsInt()
+  quantity: number;
+}

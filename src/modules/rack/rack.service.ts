@@ -229,7 +229,7 @@ export class RackService {
     return await this.removeDrugsFromRack(reqBody);
   }
 
-  async removeDrugsFromRack(reqBody: UpdateRackDrugRequestDto) {
+  async validateQuantityLeft(reqBody: UpdateRackDrugRequestDto) {
     const rackDrug = await this.rackDrugRepo.findOneBy({
       rackId: reqBody.rackId,
       drugId: reqBody.drugId,
@@ -237,6 +237,13 @@ export class RackService {
     if (!rackDrug) throw new BadRequestException('Rack drug not found.');
     if (reqBody.quantity > rackDrug.quantity)
       throw new BadRequestException('Quantity left not enough.');
+  }
+
+  async removeDrugsFromRack(reqBody: UpdateRackDrugRequestDto) {
+    const rackDrug = await this.rackDrugRepo.findOneBy({
+      rackId: reqBody.rackId,
+      drugId: reqBody.drugId,
+    });
     return await this.updateRackDrug({
       ...reqBody,
       quantity: rackDrug.quantity - reqBody.quantity,

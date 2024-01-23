@@ -9,5 +9,6 @@ import { BranchModule } from '../branch/branch.module';
   imports: [SharedModule, DrugModule, BranchModule],
   providers: [RackService],
   controllers: [RackController],
+  exports: [RackService],
 })
 export class RackModule {}
