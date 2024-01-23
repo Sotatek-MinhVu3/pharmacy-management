@@ -26,6 +26,7 @@ export class DrugService {
     }
     const drug = {
       name: reqBody.name,
+      img: reqBody.img,
       typeId: reqBody.typeId,
       supplierId: reqBody.supplierId,
       soldAsDose: reqBody.soldAsDose,
