@@ -15,6 +15,9 @@ export class CreateDrugDto {
   name: string;
 
   @IsNotEmpty()
+  img: string;
+
+  @IsNotEmpty()
   @IsInt()
   @IsPositive()
   typeId: number;

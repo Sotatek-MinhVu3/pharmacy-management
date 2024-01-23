@@ -10,16 +10,17 @@ export class CreateSupplierDto {
 
   @IsNotEmpty()
   phone: string;
+
+  @IsNotEmpty()
+  img: string;
 }
 
 export class UpdateSupplierDto {
-  @IsNotEmpty()
   name: string;
 
-  @IsNotEmpty()
   @IsEmail()
   email: string;
 
-  @IsNotEmpty()
   phone: string;
+  img: string;
 }
