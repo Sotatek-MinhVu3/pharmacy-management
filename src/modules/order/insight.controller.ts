@@ -39,14 +39,14 @@ export class InsightController {
       this.orderService.getAllRejectedOrders(req.user.branchId),
       this.orderService.getAllSubOrders(req.user.branchId),
     ]);
-    return {
-      created: createdOrders.length,
-      approved: approvedOrders.length,
-      delivered: deliveredOrders.length,
-      done: doneOrders.length,
-      rejected: rejectedOrders.length,
-      splitted: subOrders.length,
-    };
+    return [
+      { created: createdOrders.length },
+      { approved: approvedOrders.length },
+      { delivered: deliveredOrders.length },
+      { done: doneOrders.length },
+      { rejected: rejectedOrders.length },
+      { splitted: subOrders.length },
+    ];
   }
 
   @Get('branches/sales')
