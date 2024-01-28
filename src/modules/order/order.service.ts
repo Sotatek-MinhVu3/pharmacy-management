@@ -168,11 +168,13 @@ export class OrderService {
   }
 
   async getOrderDrugsByOrderId(orderId: number) {
+    let res = [];
     const orderDrugs = await this.orderDrugRepo.find({ where: { orderId } });
-    if (!orderDrugs.length) {
-      return [];
+    for (const orderDrug of orderDrugs) {
+      const drug = await this.drugService.getDrugById(orderDrug.drugId);
+      res.push({ ...orderDrug, drugName: drug.name });
     }
-    return orderDrugs;
+    return res;
   }
 
   async getOrderById(id: number) {
