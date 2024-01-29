@@ -203,6 +203,21 @@ export class OrderService {
   }
 
   async serveOrder(id: number, reqBody: ServeOrderRequestDto[]) {
+    //Validate quantity
+    const order = await this.getOrderById(id);
+    const drugs = order.drugsWithQuantity;
+    for (const drug of drugs) {
+      let quantity = 0;
+      reqBody.forEach((order) => {
+        if (order.drugId === drug.drugId) {
+          quantity += order.quantity;
+        }
+      });
+      if (quantity !== drug.quantity) {
+        throw new BadRequestException('Drugs does not match.');
+      }
+    }
+
     //Validate quantity left
     for (const serveOrderReq of reqBody) {
       await this.rackService.validateQuantityLeft(serveOrderReq);
@@ -230,9 +245,7 @@ export class OrderService {
         }
       });
       if (quantity !== drug.quantity) {
-        throw new BadRequestException(
-          'Drugs in splitted order does not match drugs in parent order.',
-        );
+        throw new BadRequestException('Drugs in sub orders does not match.');
       }
     }
   }
